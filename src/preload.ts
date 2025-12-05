@@ -123,6 +123,14 @@ const ipcHandlers: ElectronIPCHandlers = {
     ipcRenderer.on("message-count", handler);
     return () => ipcRenderer.off("message-count", handler);
   },
+  onProfileAvatar: (callback) => {
+    const handler = (
+      _: IpcRendererEvent,
+      detail: { tabId: string; url: string }
+    ) => callback(detail);
+    ipcRenderer.on("profile-avatar", handler);
+    return () => ipcRenderer.off("profile-avatar", handler);
+  },
 };
 
 contextBridge.exposeInMainWorld("electronIPCHandlers", ipcHandlers);

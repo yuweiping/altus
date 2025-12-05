@@ -17,4 +17,7 @@ export type ElectronIPCHandlers = {
   onMessageCount: (
     callback: (detail: { messageCount: number; tabId: string }) => void
   ) => () => void;
+  onProfileAvatar: (
+    callback: (detail: { tabId: string; url: string }) => void
+  ) => () => void;
 };

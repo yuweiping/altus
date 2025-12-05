@@ -634,8 +634,11 @@ function addIPCHandlers(mainWindow: BrowserWindow) {
       }
     }
   });
-}
 
+  ipcMain.on("profile-avatar", (_, detail: { tabId: string; url: string }) => {
+    mainWindow.webContents.send("profile-avatar", detail);
+  });
+}
 type CloneableMenuItem = Omit<MenuItem, "menu" | "submenu" | "click"> & {
   submenu?: CloneableMenu;
 };

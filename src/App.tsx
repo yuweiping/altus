@@ -51,7 +51,9 @@ const App: Component = () => {
             "h-full flex overflow-hidden",
             getSettingValue("tabBarPosition") === "top"
               ? "flex-col"
-              : "flex-col-reverse"
+              : getSettingValue("tabBarPosition") === "bottom"
+              ? "flex-col-reverse"
+              : "flex-row"
           )}
         >
           <TabsList />
@@ -61,7 +63,7 @@ const App: Component = () => {
                 role="tabpanel"
                 id={`tabpanel-${tab.id}`}
                 class={twJoin(
-                  "min-h-0 flex-grow text-white",
+                  "min-h-0 min-w-0 flex-grow bg-[#F7F5F4]",
                   tabStore.selectedTabId !== tab.id && "hidden"
                 )}
               >
