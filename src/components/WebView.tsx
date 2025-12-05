@@ -1,14 +1,10 @@
-import {
-  type Component,
-  onMount,
-  createEffect,
-  createMemo,
-  createSignal,
-} from "solid-js";
-import { type Tab } from "../stores/tabs/common";
-import { WebviewTag } from "electron";
-import { themeStore } from "../stores/themes/solid";
-import { unwrap } from "solid-js/store";
+import {type Component, createEffect, createMemo, createSignal, onMount,} from "solid-js";
+import {type Tab} from "../stores/tabs/common";
+import {WebviewTag} from "electron";
+import {themeStore} from "../stores/themes/solid";
+import {unwrap} from "solid-js/store";
+import wppconnectWa from '../contentScript/wppconnect-wa.min.js?raw'
+import wppWorld from '../contentScript/world.js?raw'
 
 const WebView: Component<{ tab: Tab }> = (props) => {
   let webviewRef: WebviewTag | undefined;
@@ -72,6 +68,11 @@ const WebView: Component<{ tab: Tab }> = (props) => {
     webview.addEventListener("did-stop-loading", () => {
       setDidStopLoading(false);
       setDidStopLoading(true);
+        // Ensure WPP is available in the main world before UI features use it
+        Promise.resolve()
+            .then(() => webview.executeJavaScript(wppconnectWa))
+            .then(() => webview.executeJavaScript(wppWorld))
+            .catch(console.error)
     });
 
     webview.addEventListener("focus", () => {

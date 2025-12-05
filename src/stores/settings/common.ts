@@ -3,7 +3,7 @@ import z from "zod";
 
 const SettingsSchema = z.object({
   tabBar: z.object({ value: z.boolean() }),
-  tabBarPosition: z.object({ value: z.enum(["top", "bottom"]) }),
+  tabBarPosition: z.object({ value: z.enum(["top", "bottom", "left"]) }),
   trayIcon: z.object({ value: z.boolean() }),
   tabClosePrompt: z.object({ value: z.boolean() }),
   closeToTray: z.object({ value: z.boolean() }),
@@ -20,6 +20,7 @@ const SettingsSchema = z.object({
   rememberWindowSize: z.object({ value: z.boolean() }),
   rememberWindowPosition: z.object({ value: z.boolean() }),
   language: z.object({ value: z.enum(languages) }),
+  translateProvider: z.object({ value: z.enum(["microsoft", "google"]) }),
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
@@ -47,6 +48,7 @@ export const DefaultSettingValues = {
   rememberWindowSize: false,
   rememberWindowPosition: false,
   language: "en",
+  translateProvider: "microsoft",
 } as const satisfies { [Key in SettingKey]: Settings[Key]["value"] };
 
 export const getDefaultSettings = (): Settings => ({
@@ -70,6 +72,7 @@ export const getDefaultSettings = (): Settings => ({
     value: DefaultSettingValues.rememberWindowPosition,
   },
   language: { value: DefaultSettingValues.language },
+  translateProvider: { value: DefaultSettingValues.translateProvider },
 });
 
 export type ElectronSettingsStoreIpcApi = {

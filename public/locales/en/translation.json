@@ -17,7 +17,7 @@
   "pt-br": "Portugues (pt-br)",
   "de": "Deutsch (de)",
   "tr": "Turkish (tr)",
-  "zh-cn": "中文 (zh-cn)",
+  "zh-cn": "简体中文 (zh-cn)",
   "Tab": "Tab",
   "Add New Tab": "Add New Tab",
   "Edit Active Tab": "Edit Active Tab",
@@ -105,4 +105,8 @@
   "Cancel": "Cancel",
   "Are you sure you want to exit?": "Are you sure you want to exit?",
   "Pick color": "Pick color"
+  ,
+  "translateProvider": "Translate Provider",
+  "Microsoft": "Microsoft",
+  "Google": "Google"
 }

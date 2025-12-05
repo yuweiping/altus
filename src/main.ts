@@ -563,6 +563,49 @@ function addIPCHandlers(mainWindow: BrowserWindow) {
     }
   });
 
+  ipcMain.handle(
+    "translate-text",
+    async (
+      _event,
+      payload: { provider: "microsoft" | "google"; text: string }
+    ) => {
+      try {
+        if (payload.provider === "google") {
+          const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(
+            payload.text
+          )}`;
+          const res = await fetch(url);
+          const data = await res.json();
+          const translated = (data[0] as Array<[string]>).map((i) => i[0]).join("");
+          return { ok: true, text: translated };
+        } else {
+          const tokenRes = await fetch(
+            "https://edge.microsoft.com/translate/auth"
+          );
+          const token = await tokenRes.text();
+          const endpoint =
+            "https://api-edge.cognitive.microsofttranslator.com/translate?fromLang=auto-detect&to=en&api-version=3.0";
+          const res = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify([{ Text: payload.text }]),
+          });
+          const data = await res.json();
+          const translated =
+            data?.[0]?.translations?.[0]?.text ?? payload.text;
+          return { ok: true, text: translated };
+        }
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : String(error);
+        return { ok: false, error: message };
+      }
+    }
+  );
+
   ipcMain.on("message-count", (_, detail) => {
     mainWindow.webContents.send("message-count", detail);
     if (!getSettingWithDefault("notificationBadge")) {

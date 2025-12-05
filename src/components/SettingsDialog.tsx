@@ -107,12 +107,12 @@ const SettingsDialog: Component<{
                       </div>
                     </div>
                   }
-                  options={["top", "bottom"]}
+                  options={["top", "bottom", "left"]}
                   value={getSettingValue("tabBarPosition")}
                   onChange={(position) => {
                     setSettingValue(
                       "tabBarPosition",
-                      position as "top" | "bottom"
+                      position as "top" | "bottom" | "left"
                     );
                   }}
                   valueRender={(state) => state.selectedOption()}
@@ -288,6 +288,34 @@ const SettingsDialog: Component<{
                     spellcheck={false}
                   />
                 </TextField.Root>
+              </div>
+              <div class="py-2.5">
+                <StyledSelect
+                  rootClass="items-start justify-between"
+                  triggerClass="min-w-[15ch]"
+                  multiple={false}
+                  label={
+                    <div class="flex flex-col gap-1.5">
+                      <div class="font-semibold">{t("translateProvider")}</div>
+                    </div>
+                  }
+                  options={["microsoft", "google"]}
+                  value={getSettingValue("translateProvider")}
+                  onChange={(provider) => {
+                    setSettingValue(
+                      "translateProvider",
+                      provider as "microsoft" | "google"
+                    );
+                  }}
+                  valueRender={(state) =>
+                    state.selectedOption() === "microsoft"
+                      ? t("Microsoft")
+                      : t("Google")
+                  }
+                  itemLabelRender={(item) =>
+                    item.rawValue === "microsoft" ? t("Microsoft") : t("Google")
+                  }
+                />
               </div>
             </Dialog.Description>
           </Dialog.Content>

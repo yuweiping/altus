@@ -2,6 +2,8 @@ import { ipcRenderer } from "electron";
 import { Theme } from "./stores/themes/common";
 import { formatSelectedText } from "./utils/webview/formatSelectedText";
 import { getLuminance } from "color2k";
+import { initTimeDisplay } from "./contentScript/timeDisplay.js";
+import { initTranslateButton } from "./contentScript/translateButton.js";
 
 let titleElement: HTMLTitleElement;
 
@@ -64,6 +66,56 @@ window.onload = () => {
   });
 
   registerTitleElementObserver();
+  tryRegisterProfileAvatarObserver();
+  setupCountryTimeIntegration();
+  // Provide provider getter for translateButton
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (window as any).__ALTUS_GET_TRANSLATE_PROVIDER = async () => {
+    try {
+      const settings = await ipcRenderer.invoke("settings-store-get");
+      return settings.translateProvider?.value ?? "microsoft";
+    } catch {
+      return "microsoft";
+    }
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (window as any).__ALTUS_TRANSLATE = async (text: string) => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const provider = await (window as any).__ALTUS_GET_TRANSLATE_PROVIDER();
+      return await ipcRenderer.invoke("translate-text", { provider, text });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      return { ok: false, error: message };
+    }
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (window as any).__ALTUS_TOAST = (message: string) => {
+    const styleId = "altus-toast-style";
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement("style");
+      style.id = styleId;
+      style.innerHTML = `
+        #altus-toast{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:99999;pointer-events:none;opacity:1;transition:opacity .2s ease}
+        #altus-toast{background:color-mix(in srgb,var(--bg, #0f1115), var(--ac, #12B76A) 20%);color:var(--fg, #ffffff);border:1px solid var(--ac, #12B76A);padding:8px 12px;border-radius:6px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+      `;
+      document.head.appendChild(style);
+    }
+    const id = "altus-toast";
+    let el = document.getElementById(id);
+    if (!el) {
+      el = document.createElement("div");
+      el.id = id;
+      document.body.appendChild(el);
+    }
+    el.textContent = message;
+    el.style.opacity = "1";
+    setTimeout(() => {
+      if (!el) return;
+      el.style.opacity = "0";
+    }, 2500);
+  };
+
 };
 
 function getMessageCountFromTitle(title: string) {
@@ -94,6 +146,119 @@ function registerTitleElementObserver() {
     subtree: true,
     childList: true,
     characterData: true,
+  });
+}
+
+function findProfileAvatarUrl(): string | undefined {
+  const selectors = [
+    '[data-testid="my-avatar"] img',
+    '[data-testid="user-avatar"] img',
+    '[data-testid*="avatar"] img',
+    '#side header img',
+    'header img',
+    'img[alt*="profile" i]',
+    'img[alt*="avatar" i]'
+  ];
+  for (const sel of selectors) {
+    const img = document.querySelector(sel) as HTMLImageElement | null;
+    if (img && img.src) return img.src;
+  }
+  return undefined;
+}
+
+function tryRegisterProfileAvatarObserver() {
+  const sendIfFound = () => {
+    const url = findProfileAvatarUrl();
+    const tabId = document.body.dataset.tabId;
+    if (url && tabId) {
+      ipcRenderer.send('profile-avatar', { tabId, url });
+      return true;
+    }
+    return false;
+  };
+
+  if (sendIfFound()) return;
+  const interval = setInterval(() => {
+    if (sendIfFound()) clearInterval(interval);
+  }, 3000);
+
+  const observer = new MutationObserver(() => {
+    if (sendIfFound()) observer.disconnect();
+  });
+  observer.observe(document.body, { subtree: true, childList: true });
+}
+
+const SELECTORS = {
+  PHONE_SPAN:
+    'span[dir="auto"].x1iyjqo2.x6ikm8r.x10wlt62.x1n2onr6.xlyipyv.xuxw1ft.x1rg5ohu._ao3e',
+  STATUS_LINE:
+    ".x78zum5.xdt5ytf.x1iyjqo2.xl56j7k.xeuugli.xtnn1bt.x9v5kkp.xmw7ebm.xrdum7p",
+};
+
+let currentPhoneSpan: HTMLElement | null = null;
+let hasInitializedForCurrentChat = false;
+
+function onChatDetected(phoneSpan: HTMLElement) {
+  if (phoneSpan === currentPhoneSpan) return;
+  currentPhoneSpan = phoneSpan;
+  hasInitializedForCurrentChat = false;
+  setTimeout(() => {
+    if (hasInitializedForCurrentChat) return;
+    if (
+      document.querySelector(
+        '[contenteditable="true"][data-lexical-editor="true"]'
+      )
+    ) {
+      initTimeDisplay(phoneSpan);
+      initTranslateButton();
+      hasInitializedForCurrentChat = true;
+    }
+  }, 300);
+}
+
+function handleStatusLine(statusElement: Element) {
+  let container: Element | null = statusElement;
+  for (let i = 0; i < 6 && container; i++) {
+    const phoneSpan = container.querySelector(
+      SELECTORS.PHONE_SPAN
+    ) as HTMLElement | null;
+    if (phoneSpan) {
+      onChatDetected(phoneSpan);
+      return;
+    }
+    container = container.parentElement;
+  }
+}
+
+function setupCountryTimeIntegration() {
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (!(node instanceof Element)) continue;
+        if ((node as Element).matches?.(SELECTORS.STATUS_LINE)) {
+          handleStatusLine(node as Element);
+          return;
+        }
+        const statusInNode = (node as Element).querySelector?.(
+          SELECTORS.STATUS_LINE
+        );
+        if (statusInNode) {
+          handleStatusLine(statusInNode);
+          return;
+        }
+      }
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+  setTimeout(() => {
+    const statusLine = document.querySelector(SELECTORS.STATUS_LINE);
+    if (statusLine) handleStatusLine(statusLine);
+  }, 1500);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      const event = new CustomEvent("whatsapp-foreground");
+      document.dispatchEvent(event);
+    }
   });
 }
 
