@@ -75,7 +75,7 @@ const TabComponent: Component<TabComponentProps> = (props) => {
       id={props.tab.id}
       aria-controls={`tabpanel-${props.tab.id}`}
       aria-selected={isSelected() ? "true" : "false"}
-      class="group relative flex flex-shrink-0 items-center justify-center gap-0 bg-white px-2 py-1.5 text-white text-sm leading-4 ui-selected:bg-white hover:bg-white/10 select-none"
+      class="group relative flex flex-shrink-0 items-center justify-center gap-0 bg-[#f9f9f9] px-2 py-1.5 text-white text-sm leading-4 ui-selected:bg-[#f9f9f9] hover:bg-[#f9f9f9]/10 select-none"
 
       style={{}}
       onClick={() => setTabActive(props.tab.id)}
@@ -317,8 +317,8 @@ const TabsList: Component = () => {
       <div
         class={twJoin(
           getSettingValue("tabBarPosition") === "left"
-            ? "bg-white w-16 h-full flex flex-col flex-shrink-0"
-            : "bg-white  w-full flex",
+            ? "bg-[#f9f9f9] w-16 h-full flex flex-col flex-shrink-0"
+            : "bg-[#f9f9f9]  w-full flex",
           getSettingValue("tabBar") ? "" : "hidden"
         )}
       >
@@ -377,13 +377,13 @@ const TabsList: Component = () => {
           </For>
           <button
             class={twJoin(
-              "group flex items-center justify-center bg-white px-2 py-1.5 hover:bg-white/10 select-none",
+              "group flex items-center justify-center bg-[#f9f9f9] px-2 py-1.5 hover:bg-[#f9f9f9]/10 select-none",
               getSettingValue("tabBarPosition") === "left" ? "w-full mt-2" : "ml-2"
             )}
             onClick={addNewTab}
           >
             <div class="sr-only">Add new tab</div>
-            <div class="w-10 h-10 rounded-full border border-[#E9E3DE] bg-white flex items-center justify-center">
+            <div class="w-10 h-10 rounded-full border border-[#E9E3DE] bg-[#f9f9f9] flex items-center justify-center">
               <svg viewBox="0 0 24 24" class="w-7 h-7 text-[#12B76A]">
                 <path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" />
               </svg>
@@ -393,11 +393,11 @@ const TabsList: Component = () => {
         {getSettingValue("tabBarPosition") === "left" ? (
           <div class="mt-auto flex flex-col gap-2 px-2 pb-4">
             <button
-              class="group flex items-center justify-center bg-white hover:bg-white/10 select-none w-full"
+              class="group flex items-center justify-center bg-[#f9f9f9] hover:bg-[#f9f9f9]/10 select-none w-full"
               onClick={() => window.clickMenuItem("open-settings")}
             >
               <div class="sr-only">Open settings</div>
-              <div class="w-10 h-10 rounded-full border border-[#E9E3DE] bg-white flex items-center justify-center">
+              <div class="w-10 h-10 rounded-full border border-[#E9E3DE] bg-[#f9f9f9] flex items-center justify-center">
                 <SettingsIcon class="w-6 h-6 text-[#6B7280]" />
               </div>
             </button>
@@ -405,11 +405,11 @@ const TabsList: Component = () => {
         ) : (
           <div class="flex items-center gap-2 pr-4">
             <button
-              class="group flex items-center justify-center bg-white px-2 py-1.5 hover:bg-white/10 select-none"
+              class="group flex items-center justify-center bg-[#f9f9f9] px-2 py-1.5 hover:bg-[#f9f9f9]/10 select-none"
               onClick={() => window.clickMenuItem("open-settings")}
             >
               <div class="sr-only">Open settings</div>
-              <div class="w-10 h-10 rounded-full border border-[#E9E3DE] bg-white flex items-center justify-center">
+              <div class="w-10 h-10 rounded-full border border-[#E9E3DE] bg-[#f9f9f9] flex items-center justify-center">
                 <SettingsIcon class="w-6 h-6 text-[#6B7280]" />
               </div>
             </button>
@@ -427,7 +427,7 @@ const TabsList: Component = () => {
               }}
             />
             <div
-              class="fixed z-50 text-sm py-1 bg-white border rounded border-zinc-600 shadow"
+              class="fixed z-50 text-sm py-1 bg-[#f9f9f9] border rounded border-zinc-600 shadow"
               style={{ left: `${menu().x}px`, top: `${menu().y}px` }}
             >
               <button

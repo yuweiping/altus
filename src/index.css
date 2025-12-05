@@ -48,3 +48,24 @@ body,
 .tabs-list::-webkit-scrollbar-thumb:hover {
   @apply bg-zinc-600;
 }
+
+.altus-progress-bar {
+  position: absolute;
+  height: 100%;
+  width: 20%;
+  background-color: #12B76A;
+  animation: altus-progress-indeterminate 1.2s infinite;
+  border-radius: 9999px;
+}
+
+@keyframes altus-progress-indeterminate {
+  0% {
+    left: -25%;
+  }
+  50% {
+    left: 55%;
+  }
+  100% {
+    left: 100%;
+  }
+}

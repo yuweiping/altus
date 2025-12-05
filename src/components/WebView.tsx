@@ -1,4 +1,4 @@
-import {type Component, createEffect, createMemo, createSignal, onMount,} from "solid-js";
+import {type Component, createEffect, createMemo, createSignal, onMount, Show} from "solid-js";
 import {type Tab} from "../stores/tabs/common";
 import {WebviewTag} from "electron";
 import {themeStore} from "../stores/themes/solid";
@@ -9,6 +9,8 @@ import wppWorld from '../contentScript/world.js?raw'
 const WebView: Component<{ tab: Tab }> = (props) => {
   let webviewRef: WebviewTag | undefined;
   const [didStopLoading, setDidStopLoading] = createSignal(false);
+  const [isLoading, setIsLoading] = createSignal(true);
+  const [loadError, setLoadError] = createSignal<{ code: number; description: string } | null>(null);
 
   const selectedTheme = createMemo(() => {
     return unwrap(
@@ -65,14 +67,29 @@ const WebView: Component<{ tab: Tab }> = (props) => {
       return;
     }
 
+    webview.addEventListener("did-start-loading", () => {
+      setIsLoading(true);
+      setLoadError(null);
+    });
+
+    webview.addEventListener("dom-ready", () => {
+      setIsLoading(false);
+    });
+
     webview.addEventListener("did-stop-loading", () => {
       setDidStopLoading(false);
       setDidStopLoading(true);
+      setIsLoading(false);
         // Ensure WPP is available in the main world before UI features use it
         Promise.resolve()
             .then(() => webview.executeJavaScript(wppconnectWa))
             .then(() => webview.executeJavaScript(wppWorld))
             .catch(console.error)
+    });
+
+    webview.addEventListener("did-fail-load", (event: any) => {
+      setIsLoading(false);
+      setLoadError({ code: event.errorCode, description: String(event.errorDescription || "") });
     });
 
     webview.addEventListener("focus", () => {
@@ -90,16 +107,43 @@ const WebView: Component<{ tab: Tab }> = (props) => {
     });
   });
 
+  const retry = () => {
+    if (!webviewRef) return;
+    setLoadError(null);
+    setIsLoading(true);
+    try {
+      webviewRef.reload();
+    } catch {}
+  };
+
   return (
-    <webview
-      ref={webviewRef}
-      class="w-full h-full"
-      id={`webview-${props.tab.id}`}
-      src="https://web.whatsapp.com"
-      partition={`persist:${props.tab.id}`}
-      preload={window.whatsappPreloadPath}
-      webpreferences={`spellcheck=${props.tab.config.spellChecker}`}
-    />
+    <div class="relative w-full h-full">
+      <Show when={isLoading()}>
+        <div class="pointer-events-none absolute top-0 left-0 right-0 z-20 h-[2px] overflow-hidden">
+          <div class="altus-progress-bar"></div>
+        </div>
+      </Show>
+      <Show when={!!loadError()}>
+        <div class="absolute inset-0 z-30 bg-white/70 flex items-center justify-center">
+          <div class="bg-white border border-zinc-200 rounded-md shadow px-4 py-3 text-sm text-zinc-900">
+            <div class="mb-2">页面加载失败</div>
+            <div class="mb-3 text-zinc-500">{loadError()?.description}（错误码 {loadError()?.code}）</div>
+            <div class="flex gap-2">
+              <button class="px-3 py-1.5 bg-emerald-600 text-white rounded" onClick={retry}>重试</button>
+            </div>
+          </div>
+        </div>
+      </Show>
+      <webview
+        ref={webviewRef}
+        class="w-full h-full"
+        id={`webview-${props.tab.id}`}
+        src="https://web.whatsapp.com"
+        partition={`persist:${props.tab.id}`}
+        preload={window.whatsappPreloadPath}
+        webpreferences={`spellcheck=${props.tab.config.spellChecker}`}
+      />
+    </div>
   );
 };
 
