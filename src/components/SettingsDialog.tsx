@@ -18,7 +18,7 @@ const SettingsDialog: Component<{
         <Dialog.Overlay class="fixed inset-0 z-50 bg-black/30" />
         <div class="fixed inset-0 z-50 flex items-center justify-center">
           <Dialog.Content
-            class="flex flex-col z-50 bg-zinc-800 text-white border rounded border-zinc-600 min-w-[30rem] px-3.5 pt-3 pb-2 max-w-[min(calc(100vw_-_1rem),32rem)] max-h-[70vh] overflow-hidden"
+            class="flex flex-col z-50 bg-white text-black border rounded border-zinc-300 min-w-[30rem] px-3.5 pt-3 pb-2 max-w-[min(calc(100vw_-_1rem),32rem)] max-h-[70vh] overflow-hidden"
             onPointerDownOutside={(event) => {
               if (
                 (event.target as HTMLElement).closest(
@@ -44,7 +44,7 @@ const SettingsDialog: Component<{
                 >
                   <div class="flex flex-col gap-1.5">
                     <div class="font-semibold">{t("trayIcon")}</div>
-                    <div class="text-zinc-300 max-w-[30ch] leading-snug text-sm">
+                    <div class="text-zinc-700 max-w-[30ch] leading-snug text-sm">
                       {t("trayIconDescription")}
                     </div>
                   </div>
@@ -58,7 +58,7 @@ const SettingsDialog: Component<{
                 >
                   <div class="flex flex-col gap-1.5">
                     <div class="font-semibold">{t("showTabBar")}</div>
-                    <div class="text-zinc-300 max-w-[30ch] leading-snug text-sm">
+                    <div class="text-zinc-700 max-w-[30ch] leading-snug text-sm">
                       {t("showTabBarDescription")}
                     </div>
                   </div>
@@ -72,7 +72,7 @@ const SettingsDialog: Component<{
                 >
                   <div class="flex flex-col gap-1.5">
                     <div class="font-semibold">{t("exitPrompt")}</div>
-                    <div class="text-zinc-300 max-w-[30ch] leading-snug text-sm">
+                    <div class="text-zinc-700 max-w-[30ch] leading-snug text-sm">
                       {t("exitPromptDescription")}
                     </div>
                   </div>
@@ -88,7 +88,7 @@ const SettingsDialog: Component<{
                 >
                   <div class="flex flex-col gap-1.5">
                     <div class="font-semibold">{t("closeToTray")}</div>
-                    <div class="text-zinc-300 max-w-[30ch] leading-snug text-sm">
+                    <div class="text-zinc-700 max-w-[30ch] leading-snug text-sm">
                       {t("closeToTrayDescription")}
                     </div>
                   </div>
@@ -97,12 +97,12 @@ const SettingsDialog: Component<{
               <div class="py-2.5">
                 <StyledSelect
                   rootClass="items-start justify-between"
-                  triggerClass="min-w-[15ch]"
+                  triggerClass="min-w-[15ch] bg-white text-black border-zinc-300"
                   multiple={false}
                   label={
                     <div class="flex flex-col gap-1.5">
                       <div class="font-semibold">{t("tabBarPosition")}</div>
-                      <div class="text-zinc-300 max-w-[30ch] leading-snug text-sm">
+                      <div class="text-zinc-700 max-w-[30ch] leading-snug text-sm">
                         {t("tabBarPositionDescription")}
                       </div>
                     </div>
@@ -129,7 +129,7 @@ const SettingsDialog: Component<{
                 >
                   <div class="flex flex-col gap-1.5">
                     <div class="font-semibold">{t("promptWhenClosingTab")}</div>
-                    <div class="text-zinc-300 max-w-[30ch] leading-snug text-sm">
+                    <div class="text-zinc-700 max-w-[30ch] leading-snug text-sm">
                       {t("promptWhenClosingTabDescription")}
                     </div>
                   </div>
@@ -143,7 +143,7 @@ const SettingsDialog: Component<{
                 >
                   <div class="flex flex-col gap-1.5">
                     <div class="font-semibold">{t("autoLaunch")}</div>
-                    <div class="text-zinc-300 max-w-[30ch] leading-snug text-sm">
+                    <div class="text-zinc-700 max-w-[30ch] leading-snug text-sm">
                       {t("autoLaunchDescription")}
                     </div>
                   </div>
@@ -159,7 +159,7 @@ const SettingsDialog: Component<{
                 >
                   <div class="flex flex-col gap-1.5">
                     <div class="font-semibold">{t("launchMinimized")}</div>
-                    <div class="text-zinc-300 max-w-[30ch] leading-snug text-sm">
+                    <div class="text-zinc-700 max-w-[30ch] leading-snug text-sm">
                       {t("launchMinimizedDescription")}
                     </div>
                   </div>
@@ -175,7 +175,7 @@ const SettingsDialog: Component<{
                 >
                   <div class="flex flex-col gap-1.5">
                     <div class="font-semibold">{t("rememberWindowSize")}</div>
-                    <div class="text-zinc-300 max-w-[30ch] leading-snug text-sm">
+                    <div class="text-zinc-700 max-w-[30ch] leading-snug text-sm">
                       {t("rememberWindowSizeDescription")}
                     </div>
                   </div>
@@ -193,7 +193,7 @@ const SettingsDialog: Component<{
                     <div class="font-semibold">
                       {t("rememberWindowPosition")}
                     </div>
-                    <div class="text-zinc-300 max-w-[30ch] leading-snug text-sm">
+                    <div class="text-zinc-700 max-w-[30ch] leading-snug text-sm">
                       {t("rememberWindowPositionDescription")}
                     </div>
                   </div>
@@ -209,7 +209,7 @@ const SettingsDialog: Component<{
                 >
                   <div class="flex flex-col gap-1.5">
                     <div class="font-semibold">{t("preventEnter")}</div>
-                    <div class="text-zinc-300 max-w-[30ch] leading-snug text-sm">
+                    <div class="text-zinc-700 max-w-[30ch] leading-snug text-sm">
                       {t("preventEnterDescription")}
                     </div>
                   </div>
@@ -228,7 +228,7 @@ const SettingsDialog: Component<{
                 >
                   <div class="flex flex-col gap-1.5">
                     <div class="font-semibold">{t("customTitlebar")}</div>
-                    <div class="text-zinc-300 max-w-[40ch] leading-snug text-sm">
+                    <div class="text-zinc-700 max-w-[40ch] leading-snug text-sm">
                       {t("customTitlebarDescription")}
                     </div>
                   </div>
@@ -245,7 +245,7 @@ const SettingsDialog: Component<{
                 >
                   <div class="flex flex-col gap-1.5">
                     <div class="font-semibold">{t("autoHideMenuBar")}</div>
-                    <div class="text-zinc-300 max-w-[40ch] leading-snug text-sm">
+                    <div class="text-zinc-700 max-w-[40ch] leading-snug text-sm">
                       {t("autoHideMenuBarDescription")}
                     </div>
                   </div>
@@ -261,7 +261,7 @@ const SettingsDialog: Component<{
                 >
                   <div class="flex flex-col gap-1.5">
                     <div class="font-semibold">{t("showSaveDialog")}</div>
-                    <div class="text-zinc-300 max-w-[40ch] leading-snug text-sm">
+                    <div class="text-zinc-700 max-w-[40ch] leading-snug text-sm">
                       {t("showSaveDialogDescription")}
                     </div>
                   </div>
@@ -278,13 +278,13 @@ const SettingsDialog: Component<{
                   <TextField.Label class="text-[0.95rem] leading-none">
                     <div class="flex flex-col gap-1.5">
                       <div class="font-semibold">{t("defaultDownloadDir")}</div>
-                      <div class="text-zinc-300 max-w-[40ch] leading-snug text-sm">
+                      <div class="text-zinc-700 max-w-[40ch] leading-snug text-sm">
                         {t("defaultDownloadDirDescription")}
                       </div>
                     </div>
                   </TextField.Label>
                   <TextField.Input
-                    class="text-sm py-1.5 px-2.5 bg-zinc-700/50 border rounded border-zinc-600 outline-none focus:border-zinc-300 "
+                    class="text-sm py-1.5 px-2.5 bg-white border rounded border-zinc-300 text-black outline-none focus:border-zinc-600 "
                     spellcheck={false}
                   />
                 </TextField.Root>
@@ -292,7 +292,7 @@ const SettingsDialog: Component<{
               <div class="py-2.5">
                 <StyledSelect
                   rootClass="items-start justify-between"
-                  triggerClass="min-w-[15ch]"
+                  triggerClass="min-w-[15ch] bg-white text-black border-zinc-300"
                   multiple={false}
                   label={
                     <div class="flex flex-col gap-1.5">

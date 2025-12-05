@@ -40,7 +40,7 @@ export const DefaultSettingValues = {
   notificationBadge: true,
   launchMinimized: false,
   autoLaunch: false,
-  autoHideMenuBar: false,
+  autoHideMenuBar: true,
   showSaveDialog: true,
   defaultDownloadDir: "",
   customTitlebar: false,

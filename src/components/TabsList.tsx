@@ -8,6 +8,7 @@ import {
   createSignal,
   onCleanup,
   useContext,
+  createResource,
 } from "solid-js"
 import {
   addTab,
@@ -23,6 +24,7 @@ import TabEditDialog from "./TabEditDialog"
 import { twJoin } from "tailwind-merge"
 import { getSettingValue } from "../stores/settings/solid"
 import NewChatDialog from "./NewChatDialog"
+import SettingsIcon from "../icons/SettingsIcon"
 import { createStore } from "solid-js/store"
 import { I18NContext } from "../i18n/solid"
 
@@ -164,6 +166,7 @@ const TabsList: Component = () => {
   const canShowTabEditDialog = () => tabToEdit() !== null
 
   const [canShowNewChatDialog, setShowNewChatDialog] = createSignal(false)
+  const [_, { refetch: refetchAppMenu }] = createResource(window.getAppMenu)
 
   const addNewTab = () => {
     addTab(getDefaultTab())
@@ -305,6 +308,10 @@ const TabsList: Component = () => {
     })
   )
 
+  handlers.add(
+    window.electronIPCHandlers.onReloadCustomTitleBar(refetchAppMenu)
+  )
+
   return (
     <>
       <div
@@ -321,7 +328,7 @@ const TabsList: Component = () => {
             "tabs-list",
             getSettingValue("tabBarPosition") === "left"
               ? "flex flex-col overflow-y-auto pt-4"
-              : "flex overflow-x-auto pl-4"
+              : "flex overflow-x-auto pl-4 flex-1"
           )}
           onDragEnter={(event) => {
             if (!event.dataTransfer) return
@@ -368,21 +375,46 @@ const TabsList: Component = () => {
               />
             )}
           </For>
+          <button
+            class={twJoin(
+              "group flex items-center justify-center bg-white px-2 py-1.5 hover:bg-white/10 select-none",
+              getSettingValue("tabBarPosition") === "left" ? "w-full mt-2" : "ml-2"
+            )}
+            onClick={addNewTab}
+          >
+            <div class="sr-only">Add new tab</div>
+            <div class="w-10 h-10 rounded-full border border-[#E9E3DE] bg-white flex items-center justify-center">
+              <svg viewBox="0 0 24 24" class="w-7 h-7 text-[#12B76A]">
+                <path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" />
+              </svg>
+            </div>
+          </button>
         </div>
-        <button
-          class={twJoin(
-            "group flex items-center justify-center bg-white px-2 py-1.5 text-white text-sm leading-4 hover:bg-white/10 select-none",
-            getSettingValue("tabBarPosition") === "left" ? "w-full" : ""
-          )}
-          onClick={addNewTab}
-        >
-          <div class="sr-only">Add new tab</div>
-          <div class="w-10 h-10 rounded-full border border-[#E9E3DE] bg-white flex items-center justify-center">
-            <svg viewBox="0 0 24 24" class="w-7 h-7 text-[#12B76A]">
-              <path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" />
-            </svg>
+        {getSettingValue("tabBarPosition") === "left" ? (
+          <div class="mt-auto flex flex-col gap-2 px-2 pb-4">
+            <button
+              class="group flex items-center justify-center bg-white hover:bg-white/10 select-none w-full"
+              onClick={() => window.clickMenuItem("open-settings")}
+            >
+              <div class="sr-only">Open settings</div>
+              <div class="w-10 h-10 rounded-full border border-[#E9E3DE] bg-white flex items-center justify-center">
+                <SettingsIcon class="w-6 h-6 text-[#6B7280]" />
+              </div>
+            </button>
           </div>
-        </button>
+        ) : (
+          <div class="flex items-center gap-2 pr-4">
+            <button
+              class="group flex items-center justify-center bg-white px-2 py-1.5 hover:bg-white/10 select-none"
+              onClick={() => window.clickMenuItem("open-settings")}
+            >
+              <div class="sr-only">Open settings</div>
+              <div class="w-10 h-10 rounded-full border border-[#E9E3DE] bg-white flex items-center justify-center">
+                <SettingsIcon class="w-6 h-6 text-[#6B7280]" />
+              </div>
+            </button>
+          </div>
+        )}
       </div>
       <Show when={contextMenu()}>
         {(menu) => (
@@ -437,6 +469,7 @@ const TabsList: Component = () => {
           />
         </Show>
       </Dialog.Root>
+      {/* Settings button now opens existing SettingsDialog via menu item id */}
     </>
   )
 }
