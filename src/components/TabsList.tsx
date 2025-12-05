@@ -131,14 +131,14 @@ const TabComponent: Component<TabComponentProps> = (props) => {
         when={!!props.avatarUrl}
         fallback={
           <div
-            class="w-10 h-10 rounded-full border border-zinc-600 flex items-center justify-center"
+            class="w-10 h-10 rounded-full  flex items-center justify-center"
             classList={{
               "outline outline-[1.5px] outline-[#12B76A]": isSelected(),
             }}
             style={{ background: props.tab.config.color || "#ffffff" }}
           >
             <img
-              src={"assets/icons/avatar-placeholder.svg"}
+              src={"assets/icons/avatar-placeholder.png"}
               class="w-10 h-10"
               onError={(e) => (e.currentTarget.src = "assets/icons/icon.png")}
             />
@@ -147,9 +147,9 @@ const TabComponent: Component<TabComponentProps> = (props) => {
       >
         <img
           src={props.avatarUrl!}
-          class="w-10 h-10 rounded-full border border-zinc-600 object-cover"
+          class="w-10 h-10 rounded-full  object-cover"
           style={{
-            "box-shadow": isSelected() ? "0 0 0 4px #12B76A" : undefined,
+            "box-shadow": isSelected() ? "0 0 0 2px #12B76A" : undefined,
           }}
           onError={(e) => (e.currentTarget.src = "assets/icons/icon.png")}
         />
@@ -377,7 +377,7 @@ const TabsList: Component = () => {
           onClick={addNewTab}
         >
           <div class="sr-only">Add new tab</div>
-          <div class="w-10 h-10 rounded-full border border-zinc-600 bg-white flex items-center justify-center">
+          <div class="w-10 h-10 rounded-full border border-[#E9E3DE] bg-white flex items-center justify-center">
             <svg viewBox="0 0 24 24" class="w-7 h-7 text-[#12B76A]">
               <path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" />
             </svg>
@@ -398,15 +398,6 @@ const TabsList: Component = () => {
               class="fixed z-50 text-sm py-1 bg-white border rounded border-zinc-600 shadow"
               style={{ left: `${menu().x}px`, top: `${menu().y}px` }}
             >
-              <button
-                class="block w-full text-left px-3 py-1 hover:bg-zinc-700"
-                onClick={() => {
-                  setTabToEdit(menu().tab)
-                  setContextMenu(null)
-                }}
-              >
-                {t("Settings")}
-              </button>
               <button
                 class="block w-full text-left px-3 py-1 hover:bg-zinc-700"
                 onClick={() => {
