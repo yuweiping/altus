@@ -68,7 +68,7 @@ let tray: Tray | undefined;
 const iconsPath = path.join(__dirname, "assets", "icons");
 
 const mainIcon = nativeImage.createFromPath(
-  path.join(iconsPath, process.platform === "win32" ? "icon.ico" : "icon.png")
+  path.join(iconsPath, "icon.png")
 );
 
 const mainNotificationIcon = nativeImage.createFromPath(
@@ -76,7 +76,7 @@ const mainNotificationIcon = nativeImage.createFromPath(
 );
 
 const trayIcon = nativeImage.createFromPath(
-  path.join(iconsPath, process.platform === "win32" ? "icon.ico" : "tray.png")
+  path.join(iconsPath, "tray.png")
 );
 
 const trayNotificationIcon = nativeImage.createFromPath(
