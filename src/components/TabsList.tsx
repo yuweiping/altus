@@ -133,7 +133,7 @@ const TabComponent: Component<TabComponentProps> = (props) => {
           <div
             class="w-10 h-10 rounded-full border border-zinc-600 flex items-center justify-center"
             classList={{
-              "outline outline-[2px] outline-[#12B76A]": isSelected(),
+              "outline outline-[1.5px] outline-[#12B76A]": isSelected(),
             }}
             style={{ background: props.tab.config.color || "#ffffff" }}
           >
