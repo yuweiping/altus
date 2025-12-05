@@ -31,6 +31,10 @@ import AutoLaunch from "auto-launch";
 import electronDl from "electron-dl";
 import contextMenu from "electron-context-menu";
 
+process.on("unhandledRejection", (reason) => {
+  console.warn("Unhandled promise rejection:", reason);
+});
+
 const windowState = new Store<{
   width: number | null;
   height: number | null;
@@ -216,10 +220,21 @@ if (!singleInstanceLock) {
       name: "Altus",
     });
 
-    if (getSettingWithDefault("autoLaunch")) {
-      autoLauncher.enable();
+    const shouldAutoLaunch = getSettingWithDefault("autoLaunch");
+    if (shouldAutoLaunch) {
+      autoLauncher
+        .isEnabled()
+        .then((enabled) => {
+          if (!enabled) return autoLauncher.enable();
+        })
+        .catch(() => {});
     } else {
-      autoLauncher.disable();
+      autoLauncher
+        .isEnabled()
+        .then((enabled) => {
+          if (enabled) return autoLauncher.disable();
+        })
+        .catch(() => {});
     }
 
     const mainWindow = createWindow();
