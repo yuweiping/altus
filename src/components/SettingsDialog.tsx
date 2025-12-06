@@ -95,9 +95,25 @@ const SettingsDialog: Component<{
                 </StyledSwitch>
               </div>
               <div class="py-2.5">
+                <StyledSwitch
+                  checked={getSettingValue("autoTranslateEnabled")}
+                  onChange={(checked) =>
+                    setSettingValue("autoTranslateEnabled", checked)
+                  }
+                  class="items-start"
+                >
+                  <div class="flex flex-col gap-1.5">
+                    <div class="font-semibold">{t("autoTranslateEnabled")}</div>
+                    <div class="text-zinc-700 max-w-[40ch] leading-snug text-sm">
+                      {t("autoTranslateEnabledDescription")}
+                    </div>
+                  </div>
+                </StyledSwitch>
+              </div>
+              <div class="py-2.5">
                 <StyledSelect
                   rootClass="items-start justify-between"
-                  triggerClass="min-w-[15ch] bg-white text-black border-zinc-300"
+                  triggerClass="min-w-[15ch] bg:white text:black border-zinc-300"
                   multiple={false}
                   label={
                     <div class="flex flex-col gap-1.5">

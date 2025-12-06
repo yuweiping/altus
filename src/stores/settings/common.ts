@@ -20,6 +20,7 @@ const SettingsSchema = z.object({
   rememberWindowSize: z.object({ value: z.boolean() }),
   rememberWindowPosition: z.object({ value: z.boolean() }),
   language: z.object({ value: z.enum(languages) }),
+  autoTranslateEnabled: z.object({ value: z.boolean() }),
   translateProvider: z.object({ value: z.enum(["microsoft", "google"]) }),
 });
 
@@ -48,6 +49,7 @@ export const DefaultSettingValues = {
   rememberWindowSize: false,
   rememberWindowPosition: false,
   language: "en",
+  autoTranslateEnabled: true,
   translateProvider: "microsoft",
 } as const satisfies { [Key in SettingKey]: Settings[Key]["value"] };
 
@@ -72,6 +74,7 @@ export const getDefaultSettings = (): Settings => ({
     value: DefaultSettingValues.rememberWindowPosition,
   },
   language: { value: DefaultSettingValues.language },
+  autoTranslateEnabled: { value: DefaultSettingValues.autoTranslateEnabled },
   translateProvider: { value: DefaultSettingValues.translateProvider },
 });
 

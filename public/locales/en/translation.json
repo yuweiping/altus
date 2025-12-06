@@ -108,5 +108,7 @@
   ,
   "translateProvider": "Translate Provider",
   "Microsoft": "Microsoft",
-  "Google": "Google"
+  "Google": "Google",
+  "autoTranslateEnabled": "Auto Translate",
+  "autoTranslateEnabledDescription": "Automatically translate incoming messages to your language"
 }

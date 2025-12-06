@@ -108,5 +108,7 @@
   ,
   "translateProvider": "翻译提供商",
   "Microsoft": "微软",
-  "Google": "谷歌"
+  "Google": "谷歌",
+  "autoTranslateEnabled": "自动翻译",
+  "autoTranslateEnabledDescription": "自动将收到的消息翻译为你的语言"
 }

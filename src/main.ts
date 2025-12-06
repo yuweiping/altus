@@ -10,6 +10,7 @@ import {
   session,
   shell,
   Tray,
+  WebContents,
 } from "electron";
 import fs from "fs";
 import path from "path";
@@ -64,6 +65,7 @@ function getSettingWithDefault<Key extends SettingKey>(
 }
 
 let tray: Tray | undefined;
+const webviewContents = new Set<WebContents>();
 
 const iconsPath = path.join(__dirname, "assets", "icons");
 
@@ -268,6 +270,10 @@ if (!singleInstanceLock) {
 
   app.on("web-contents-created", (_, webContents) => {
     if (webContents.getType() === "webview") {
+      webviewContents.add(webContents);
+      webContents.once("destroyed", () => {
+        webviewContents.delete(webContents);
+      });
       contextMenu({
         window: {
           webContents: webContents,
@@ -444,7 +450,13 @@ function addIPCHandlers(mainWindow: BrowserWindow) {
       } else if (key === "trayIcon") {
         toggleTray(mainWindow, value as boolean);
       }
-      return electronSettingsStore.set(key, { value });
+      const res = electronSettingsStore.set(key, { value });
+      try {
+        for (const wc of webviewContents) {
+          wc.send("settings-changed", { key, value });
+        }
+      } catch {}
+      return res;
     }
   );
 
@@ -582,11 +594,11 @@ function addIPCHandlers(mainWindow: BrowserWindow) {
     "translate-text",
     async (
       _event,
-      payload: { provider: "microsoft" | "google"; text: string }
+      payload: { provider: "microsoft" | "google"; text: string; target: string }
     ) => {
       try {
         if (payload.provider === "google") {
-          const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(
+          const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${encodeURIComponent(payload.target)}&dt=t&q=${encodeURIComponent(
             payload.text
           )}`;
           const res = await fetch(url);
@@ -599,7 +611,7 @@ function addIPCHandlers(mainWindow: BrowserWindow) {
           );
           const token = await tokenRes.text();
           const endpoint =
-            "https://api-edge.cognitive.microsofttranslator.com/translate?fromLang=auto-detect&to=en&api-version=3.0";
+            `https://api-edge.cognitive.microsofttranslator.com/translate?fromLang=auto-detect&to=${encodeURIComponent(payload.target)}&api-version=3.0`;
           const res = await fetch(endpoint, {
             method: "POST",
             headers: {

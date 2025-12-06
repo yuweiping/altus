@@ -135,18 +135,20 @@ function setInputText(text) {
   }
 }
 
-async function translateToEnglish(text) {
+export async function translateTo(text, target = 'en') {
   if (!text.trim()) return text
   const fn = window.__ALTUS_TRANSLATE
   if (typeof fn === 'function') {
-    const res = await fn(text)
+    const res = await fn(text, target)
     if (res && res.ok) return res.text
     const msg = res && res.error ? res.error : 'Unknown error'
     throw new Error(msg)
   }
   throw new Error('Translate bridge unavailable')
 }
-
+export async function translateToEnglish(text) {
+  return translateTo(text, 'en')
+}
 // getTranslateProvider 已由预加载桥接替代，不再需要本地实现
 
 // 网络翻译逻辑由预加载桥接到主进程处理，避免 CSP 限制

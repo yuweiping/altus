@@ -4,6 +4,7 @@ import { formatSelectedText } from "./utils/webview/formatSelectedText";
 import { getLuminance } from "color2k";
 import { initTimeDisplay } from "./contentScript/timeDisplay.js";
 import { initTranslateButton } from "./contentScript/translateButton.js";
+import { initAutoTranslate } from "./contentScript/autoTranslate.js";
 
 let titleElement: HTMLTitleElement;
 
@@ -79,11 +80,26 @@ window.onload = () => {
     }
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).__ALTUS_TRANSLATE = async (text: string) => {
+  (window as any).__ALTUS_GET_AUTO_TRANSLATE_ENABLED = async () => {
+    try {
+      const settings = await ipcRenderer.invoke("settings-store-get");
+      return Boolean(settings.autoTranslateEnabled?.value ?? true);
+    } catch {
+      return true;
+    }
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (window as any).__ALTUS_ON_AUTO_TRANSLATE_CHANGE = (callback: (enabled: boolean) => void) => {
+    ipcRenderer.on("settings-changed", (_e, { key, value }) => {
+      if (key === "autoTranslateEnabled") callback(Boolean(value));
+    });
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (window as any).__ALTUS_TRANSLATE = async (text: string, target: string = 'en') => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const provider = await (window as any).__ALTUS_GET_TRANSLATE_PROVIDER();
-      return await ipcRenderer.invoke("translate-text", { provider, text });
+      return await ipcRenderer.invoke("translate-text", { provider, text, target });
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       return { ok: false, error: message };
@@ -211,6 +227,7 @@ function onChatDetected(phoneSpan: HTMLElement) {
     ) {
       initTimeDisplay(phoneSpan);
       initTranslateButton();
+      initAutoTranslate();
       hasInitializedForCurrentChat = true;
     }
   }, 300);
