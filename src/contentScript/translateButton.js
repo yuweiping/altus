@@ -75,7 +75,7 @@ export function initTranslateButton() {
     } catch (err) {
       console.error('[Translate] 错误:', err)
       try {
-        const toast = window.__ALTUS_TOAST
+        const toast = window.__WHATSAPP_TOAST
         if (typeof toast === 'function') {
           toast(`翻译失败：${err?.message || err}`)
         }
@@ -137,7 +137,7 @@ function setInputText(text) {
 
 export async function translateTo(text, target = 'en') {
   if (!text.trim()) return text
-  const fn = window.__ALTUS_TRANSLATE
+  const fn = window.__WHATSAPP_TRANSLATE
   if (typeof fn === 'function') {
     const res = await fn(text, target)
     if (res && res.ok) return res.text

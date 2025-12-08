@@ -32,10 +32,10 @@ export type SettingValue = {
 
 export const DefaultSettingValues = {
   tabBar: true,
-  tabBarPosition: "top",
+  tabBarPosition: "left",
   trayIcon: true,
   tabClosePrompt: true,
-  closeToTray: false,
+  closeToTray: true,
   exitPrompt: false,
   preventEnter: false,
   notificationBadge: true,
@@ -48,7 +48,7 @@ export const DefaultSettingValues = {
   systemScrollbars: false,
   rememberWindowSize: false,
   rememberWindowPosition: false,
-  language: "en",
+  language: "zh-cn",
   autoTranslateEnabled: true,
   translateProvider: "microsoft",
 } as const satisfies { [Key in SettingKey]: Settings[Key]["value"] };

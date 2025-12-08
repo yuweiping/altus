@@ -2240,9 +2240,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"altus@workspace:.":
+"whatsapp@workspace:.":
   version: 0.0.0-use.local
-  resolution: "altus@workspace:."
+  resolution: "whatsapp@workspace:."
   dependencies:
     "@electron-forge/cli": "npm:^7.8.0"
     "@electron-forge/maker-base": "npm:^7.8.0"

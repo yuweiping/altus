@@ -49,16 +49,16 @@ body,
   @apply bg-zinc-600;
 }
 
-.altus-progress-bar {
+.whatsapp-progress-bar {
   position: absolute;
   height: 100%;
   width: 20%;
   background-color: #12B76A;
-  animation: altus-progress-indeterminate 1.2s infinite;
+  animation: whatsapp-progress-indeterminate 1.2s infinite;
   border-radius: 9999px;
 }
 
-@keyframes altus-progress-indeterminate {
+@keyframes whatsapp-progress-indeterminate {
   0% {
     left: -25%;
   }

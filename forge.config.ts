@@ -7,7 +7,7 @@ import MakerDMG from "./makers/MakerDMG";
 const config: ForgeConfig = {
   packagerConfig: {
     icon: "./public/assets/icons/icon",
-    appBundleId: "harwara.aman.altus",
+    appBundleId: "harwara.aman.whatsapp",
     appCategoryType: "public.app-category.social-networking",
     protocols: [
       {

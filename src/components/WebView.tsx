@@ -120,7 +120,7 @@ const WebView: Component<{ tab: Tab }> = (props) => {
     <div class="relative w-full h-full">
       <Show when={isLoading()}>
         <div class="pointer-events-none absolute top-0 left-0 right-0 z-20 h-[2px] overflow-hidden">
-          <div class="altus-progress-bar"></div>
+          <div class="whatsapp-progress-bar"></div>
         </div>
       </Show>
       <Show when={!!loadError()}>

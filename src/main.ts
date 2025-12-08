@@ -127,7 +127,7 @@ function createWindow() {
       preload: path.join(__dirname, "preload.js"),
       webviewTag: true,
     },
-    title: `Altus ${app.getVersion()}`,
+    title: `Whatsapp ${app.getVersion()}`,
     show: false,
     frame: !useCustomTitlebar,
     titleBarStyle: useCustomTitlebar ? "hidden" : "default",
@@ -203,7 +203,7 @@ if (!singleInstanceLock) {
   app.on("ready", () => {
     const userAgentFallback = app.userAgentFallback;
     app.userAgentFallback = userAgentFallback.replace(
-      /(Altus|Electron)([^\s]+\s)/g,
+      /(Whatsapp|Electron)([^\s]+\s)/g,
       ""
     );
 
@@ -219,7 +219,7 @@ if (!singleInstanceLock) {
     );
 
     const autoLauncher = new AutoLaunch({
-      name: "Altus",
+      name: "Whatsapp",
     });
 
     const shouldAutoLaunch = getSettingWithDefault("autoLaunch");
@@ -406,7 +406,7 @@ function toggleTray(mainWindow: BrowserWindow, enabled: boolean) {
         })
       : trayIcon
   );
-  tray.setToolTip("Altus");
+  tray.setToolTip("Whatsapp");
   tray.setContextMenu(getLocalizedTrayMenu());
   tray.on("click", () => {
     if (process.platform !== "darwin") {
@@ -716,7 +716,7 @@ async function initializeI18N(mainWindow: BrowserWindow) {
   }
 }
 
-const versionInfo = `Altus: ${app.getVersion()}
+const versionInfo = `Whatsapp: ${app.getVersion()}
 Electron: ${process.versions.electron}
 Chrome: ${process.versions.chrome}
 V8: ${process.versions.v8}
@@ -942,7 +942,7 @@ function getLocalizedMainMenu() {
             dialog
               .showMessageBox({
                 type: "info",
-                title: `Altus v${app.getVersion()}`,
+                title: `Whatsapp v${app.getVersion()}`,
                 message: `Made by Aman Harwara.`,
                 detail: aboutDialogText,
                 icon: mainIcon,
@@ -992,7 +992,7 @@ function getLocalizedMainMenu() {
               label: electronI18N.t("Report Bugs/Issues"),
               click: () => {
                 shell.openExternal(
-                  "https://gitlab.com/amanharwara/altus/-/issues"
+                  "https://gitlab.com/amanharwara/whatsapp/-/issues"
                 );
               },
               id: "report-bugs-issues",
@@ -1007,7 +1007,7 @@ function getLocalizedMainMenu() {
             {
               label: electronI18N.t("Repository"),
               click: () => {
-                shell.openExternal("https://www.github.com/amanharwara/altus");
+                shell.openExternal("https://www.github.com/amanharwara/whatsapp");
               },
               id: "repository",
             },

@@ -243,7 +243,7 @@ function stopObserving() {
 
 async function shouldEnableAutoTranslate() {
   try {
-    const get = window.__ALTUS_GET_AUTO_TRANSLATE_ENABLED
+    const get = window.__WHATSAPP_GET_AUTO_TRANSLATE_ENABLED
     if (typeof get === 'function') {
       const val = await get()
       return Boolean(val)
@@ -272,7 +272,7 @@ export function initAutoTranslate() {
 
   // 监听配置变化
   try {
-    const onChange = window.__ALTUS_ON_AUTO_TRANSLATE_CHANGE
+    const onChange = window.__WHATSAPP_ON_AUTO_TRANSLATE_CHANGE
     if (typeof onChange === 'function') {
       onChange((val) => {
         enabled = Boolean(val)

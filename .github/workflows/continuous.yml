@@ -1,6 +1,6 @@
 # (c) Srevin Saju 2020. All rights reserved
 # Licensed under MIT License
-# Continuous Integration to release configured AppImages for Altus
+# Continuous Integration to release configured AppImages for Whatsapp
 
 name: Continuous
 
@@ -29,7 +29,7 @@ jobs:
           ls 
           git describe --tags --always
 
-      - name: Build Altus
+      - name: Build Whatsapp
         run: |
           corepack enable
           yarn install
@@ -64,7 +64,7 @@ jobs:
           corepack enable
           yarn install
 
-      - name: Build Altus
+      - name: Build Whatsapp
         run: |
           yarn run make -p darwin --arch x64
           yarn run make -p darwin --arch arm64
@@ -92,7 +92,7 @@ jobs:
           ls 
           git describe --tags --always
 
-      - name: Build Altus
+      - name: Build Whatsapp
         run: |
           corepack enable
           yarn install

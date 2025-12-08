@@ -5,7 +5,7 @@ import { formatTimeInTimezone } from './utils.js'
 let currentInfo = null
 let timeDiv = null
 let updateInterval = null
-const STYLE_ID = 'altus-wact-style'
+const STYLE_ID = 'whatsapp-wact-style'
 
 function injectStyles() {
   if (document.getElementById(STYLE_ID)) return

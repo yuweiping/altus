@@ -1,15 +1,15 @@
-# Altus
+# Whatsapp
 
-**Altus** is an Electron-based WhatsApp client with themes and multiple account support, available for Windows, Mac and Linux!
+**Whatsapp** is an Electron-based WhatsApp client with themes and multiple account support, available for Windows, Mac and Linux!
 
 ## Installation
 
 ### Windows
 
-- Download the `.exe` file from the [latest release](https://github.com/amanharwara/altus/releases/latest)
+- Download the `.exe` file from the [latest release](https://github.com/amanharwara/whatsapp/releases/latest)
 - Run the file and follow the setup wizard
 
-If you see a "Windows protected your PC" error, it's because Altus is not signed. If you have doubts you can verify the file is safe using something like VirusTotal or any other antivirus software.
+If you see a "Windows protected your PC" error, it's because Whatsapp is not signed. If you have doubts you can verify the file is safe using something like VirusTotal or any other antivirus software.
 To continue with the installation,
 
 - Click on "More info"
@@ -17,29 +17,29 @@ To continue with the installation,
 
 ### macOS
 
-- Download one of the `.dmg` files from [latest release](https://github.com/amanharwara/altus/releases/latest)
+- Download one of the `.dmg` files from [latest release](https://github.com/amanharwara/whatsapp/releases/latest)
   - If you're on an Intel mac, download the regular `.dmg` file
   - If you're on an M-series mac, download the `-arm64.dmg` file
 - Open the dmg file
-- Drag the `Altus` icon onto the `Applications` icon as instructed
+- Drag the `Whatsapp` icon onto the `Applications` icon as instructed
 
-If you're on an M-series (i.e. arm) macOS, you'll need to run the following command, otherwise you'll get a `Altus is damaged and cannot be opened.` error.
+If you're on an M-series (i.e. arm) macOS, you'll need to run the following command, otherwise you'll get a `Whatsapp is damaged and cannot be opened.` error.
 
 ```console
-sudo xattr -d com.apple.quarantine /Applications/Altus.app
+sudo xattr -d com.apple.quarantine /Applications/Whatsapp.app
 ```
 
 ### Linux
 
-- Download the `.AppImage` file from the [latest release](https://github.com/amanharwara/altus/releases/latest)
-- Make sure it is executable by running `chmod +x ./Altus-*.AppImage` in the same directory
-- Run the AppImage by either double-clicking it or running `./Altus-*.AppImage`
+- Download the `.AppImage` file from the [latest release](https://github.com/amanharwara/whatsapp/releases/latest)
+- Make sure it is executable by running `chmod +x ./Whatsapp-*.AppImage` in the same directory
+- Run the AppImage by either double-clicking it or running `./Whatsapp-*.AppImage`
 
 There are separate tools like [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) that make it easier to run the file and integrate it into your DE.
 
 ## Features
 
-**Altus** uses the GitHub-produced Electron framework to wrap around WhatsApp Web and add extra features to it.
+**Whatsapp** uses the GitHub-produced Electron framework to wrap around WhatsApp Web and add extra features to it.
 
 - **Multiple Account Support**: As of v2.0, you can use multiple WhatsApp accounts simultaneously!
 - **Native notification support** for all of the platforms. Clicking the notification opens that specific chat!
@@ -51,7 +51,7 @@ There are separate tools like [AppImageLauncher](https://github.com/TheAssassin/
 
 ## Feature Requests
 
-In order to submit a feature request, create a [new issue](https://github.com/amanharwara/altus/issues/new) with the label `enhancement`.
+In order to submit a feature request, create a [new issue](https://github.com/amanharwara/whatsapp/issues/new) with the label `enhancement`.
 
 Please make sure that you provide a helpful description of your feature request. If possible, try implementing the feature yourself by forking this repository and then creating a pull request.
 
@@ -59,15 +59,15 @@ Please make sure that you provide a helpful description of your feature request.
 
 ### First Start
 
-![Altus First Start](./img/Altus-First-Start.png)
+![Whatsapp First Start](./img/Whatsapp-First-Start.png)
 
 ### Default Theme
 
-![Altus Default Theme](./img/Altus-Default-Theme.png)
+![Whatsapp Default Theme](./img/Whatsapp-Default-Theme.png)
 
 ### "Dark Plus" Theme
 
-![Altus Dark Theme](./img/Altus-Dark-Theme.png)
+![Whatsapp Dark Theme](./img/Whatsapp-Dark-Theme.png)
 
 ## Acknowledgements
 
@@ -77,7 +77,7 @@ Below is the list of the dependencies that helped me greatly to create this app.
 
 ---
 
-#### Inter [rsms/inter](https://github.com/rsms/inter) - The font used in Altus.
+#### Inter [rsms/inter](https://github.com/rsms/inter) - The font used in Whatsapp.
 
 ---
 
@@ -85,7 +85,7 @@ Below is the list of the dependencies that helped me greatly to create this app.
 
 ## Contributors
 
-Below is the list of contributors who have contributed to Altus by creating a feature or helping fix an issue.
+Below is the list of contributors who have contributed to Whatsapp by creating a feature or helping fix an issue.
 
 #### [Melvin-Abraham](https://github.com/Melvin-Abraham) - Helped fix issues #55, #53
 

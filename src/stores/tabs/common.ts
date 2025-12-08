@@ -25,7 +25,7 @@ export const getDefaultTab = (): Tab => ({
   name: "New Tab",
   messageCount: 0,
   config: {
-    theme: "dark",
+    theme: "default",
     notifications: true,
     media: true,
     sound: true,

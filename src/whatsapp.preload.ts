@@ -71,7 +71,7 @@ window.onload = () => {
   setupCountryTimeIntegration();
   // Provide provider getter for translateButton
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).__ALTUS_GET_TRANSLATE_PROVIDER = async () => {
+  (window as any).__WHATSAPP_GET_TRANSLATE_PROVIDER = async () => {
     try {
       const settings = await ipcRenderer.invoke("settings-store-get");
       return settings.translateProvider?.value ?? "microsoft";
@@ -80,7 +80,7 @@ window.onload = () => {
     }
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).__ALTUS_GET_AUTO_TRANSLATE_ENABLED = async () => {
+  (window as any).__WHATSAPP_GET_AUTO_TRANSLATE_ENABLED = async () => {
     try {
       const settings = await ipcRenderer.invoke("settings-store-get");
       return Boolean(settings.autoTranslateEnabled?.value ?? true);
@@ -89,16 +89,16 @@ window.onload = () => {
     }
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).__ALTUS_ON_AUTO_TRANSLATE_CHANGE = (callback: (enabled: boolean) => void) => {
+  (window as any).__WHATSAPP_ON_AUTO_TRANSLATE_CHANGE = (callback: (enabled: boolean) => void) => {
     ipcRenderer.on("settings-changed", (_e, { key, value }) => {
       if (key === "autoTranslateEnabled") callback(Boolean(value));
     });
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).__ALTUS_TRANSLATE = async (text: string, target: string = 'en') => {
+  (window as any).__WHATSAPP_TRANSLATE = async (text: string, target: string = 'en') => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const provider = await (window as any).__ALTUS_GET_TRANSLATE_PROVIDER();
+      const provider = await (window as any).__WHATSAPP_GET_TRANSLATE_PROVIDER();
       return await ipcRenderer.invoke("translate-text", { provider, text, target });
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
@@ -106,18 +106,18 @@ window.onload = () => {
     }
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).__ALTUS_TOAST = (message: string) => {
-    const styleId = "altus-toast-style";
+  (window as any).__WHATSAPP_TOAST = (message: string) => {
+    const styleId = "whatsapp-toast-style";
     if (!document.getElementById(styleId)) {
       const style = document.createElement("style");
       style.id = styleId;
       style.innerHTML = `
-        #altus-toast{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:99999;pointer-events:none;opacity:1;transition:opacity .2s ease}
-        #altus-toast{background:color-mix(in srgb,var(--bg, #0f1115), var(--ac, #12B76A) 20%);color:var(--fg, #ffffff);border:1px solid var(--ac, #12B76A);padding:8px 12px;border-radius:6px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+        #whatsapp-toast{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:99999;pointer-events:none;opacity:1;transition:opacity .2s ease}
+        #whatsapp-toast{background:color-mix(in srgb,var(--bg, #0f1115), var(--ac, #12B76A) 20%);color:var(--fg, #ffffff);border:1px solid var(--ac, #12B76A);padding:8px 12px;border-radius:6px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
       `;
       document.head.appendChild(style);
     }
-    const id = "altus-toast";
+    const id = "whatsapp-toast";
     let el = document.getElementById(id);
     if (!el) {
       el = document.createElement("div");
@@ -280,12 +280,12 @@ function setupCountryTimeIntegration() {
 }
 
 function setThemeCSS(css: string) {
-  const existingStyle = document.getElementById("altus-style");
+  const existingStyle = document.getElementById("whatsapp-style");
   if (existingStyle) {
     existingStyle.innerHTML = css;
   } else {
     const styleElement = document.createElement("style");
-    styleElement.id = "altus-style";
+    styleElement.id = "whatsapp-style";
     styleElement.innerHTML = css;
     document.head.appendChild(styleElement);
   }
