@@ -748,6 +748,7 @@ function getLocalizedMainMenu() {
           label: electronI18N.t("Force &Reload"),
           role: "forceReload",
           id: "force-reload",
+          accelerator: "CmdOrCtrl+F5",
         },
         {
           label: electronI18N.t("&Quit"),
