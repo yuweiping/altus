@@ -85,6 +85,26 @@ const trayNotificationIcon = nativeImage.createFromPath(
   path.join(iconsPath, "tray-notification.png")
 );
 
+let trayFlashInterval: NodeJS.Timeout | undefined;
+let trayFlashState = false;
+
+function startTrayFlash() {
+  if (!tray || trayFlashInterval) return;
+  trayFlashInterval = setInterval(() => {
+    trayFlashState = !trayFlashState;
+    tray?.setImage(trayFlashState ? trayNotificationIcon : trayIcon);
+  }, 500);
+}
+
+function stopTrayFlash() {
+  if (trayFlashInterval) {
+    clearInterval(trayFlashInterval);
+    trayFlashInterval = undefined;
+  }
+  trayFlashState = false;
+  if (tray) tray.setImage(trayIcon);
+}
+
 function confirmAndExit() {
   dialog
     .showMessageBox({
@@ -392,6 +412,7 @@ function changeAutoHideMenuBar(mainWindow: BrowserWindow, value: boolean) {
 function toggleTray(mainWindow: BrowserWindow, enabled: boolean) {
   if (!enabled) {
     if (tray) tray.destroy();
+    stopTrayFlash();
     tray = undefined;
     return;
   }
@@ -645,7 +666,7 @@ function addIPCHandlers(mainWindow: BrowserWindow) {
           app.dock?.setBadge("·");
           break;
         default:
-          if (tray) tray.setImage(trayNotificationIcon);
+          startTrayFlash();
           mainWindow.setOverlayIcon(mainNotificationIcon, "Notification badge");
           break;
       }
@@ -655,7 +676,7 @@ function addIPCHandlers(mainWindow: BrowserWindow) {
           app.dock?.setBadge("");
           break;
         default:
-          if (tray) tray.setImage(trayIcon);
+          stopTrayFlash();
           mainWindow.setOverlayIcon(null, "Notification badge empty");
           break;
       }
