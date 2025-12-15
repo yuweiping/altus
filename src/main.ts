@@ -667,6 +667,7 @@ function addIPCHandlers(mainWindow: BrowserWindow) {
           break;
         default:
           startTrayFlash();
+          mainWindow.flashFrame(true);
           mainWindow.setOverlayIcon(mainNotificationIcon, "Notification badge");
           break;
       }
@@ -677,6 +678,7 @@ function addIPCHandlers(mainWindow: BrowserWindow) {
           break;
         default:
           stopTrayFlash();
+          mainWindow.flashFrame(false);
           mainWindow.setOverlayIcon(null, "Notification badge empty");
           break;
       }
