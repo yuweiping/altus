@@ -7,7 +7,6 @@ import MaximizeIcon from "../icons/MaximizeIcon";
 import AutoTranslateIcon from "../icons/AutoTranslateIcon";
 import CloudIcon from "../icons/CloudIcon";
 import { getSettingValue, setSettingValue } from "../stores/settings/solid";
-import { getActiveWebviewElement } from "../stores/tabs/solid";
 
 
 const CustomTitlebar: Component<{
@@ -59,7 +58,7 @@ const CustomTitlebar: Component<{
       <div class="p-1.5 mx-0.5">
         <img src="./assets/icons/icon.png?url" class="w-full h-full" />
       </div>
-
+      <div class="text-[13px] p-1.5 font-bold text-[#636460]">Whatsapp</div>
       <div class="grid grid-cols-[repeat(5,46px)] h-full [-webkit-app-region:no-drag] ml-auto">
         <button
           onClick={toggleAutoTranslate}
