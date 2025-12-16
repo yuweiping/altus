@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { contextBridge,ipcRenderer } from "electron";
 import { Theme } from "./stores/themes/common";
 import { formatSelectedText } from "./utils/webview/formatSelectedText";
 import { getLuminance } from "color2k";
@@ -7,7 +7,13 @@ import { initTranslateButton } from "./contentScript/translateButton.js";
 import { initAutoTranslate } from "./contentScript/autoTranslate.js";
 
 let titleElement: HTMLTitleElement;
-
+contextBridge.exposeInMainWorld("__WHATSAPP_SYNC", async (payload: any) => {
+    try {
+        return await ipcRenderer.invoke("wpp-sync", payload);
+    } catch (e) {
+        return {ok: false, error: e instanceof Error ? e.message : String(e)};
+    }
+});
 window.onload = () => {
   titleElement = document.querySelector("title") as HTMLTitleElement;
 

@@ -31,6 +31,64 @@ import {
 import AutoLaunch from "auto-launch";
 import electronDl from "electron-dl";
 import contextMenu from "electron-context-menu";
+import type { RawData } from "ws";
+// 使用 CommonJS 方式引入 ws，避免被打包为浏览器 stub
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const WS = require('ws');
+// 主进程中维护的WebSocket实例
+let ws: any | null = null;
+let wsConnected = false;
+let reconnectAttempts = 0;
+const maxReconnectAttempts = 5;
+const reconnectDelay = 3000;
+const wsUrl = "ws://localhost:82/ws";
+
+// 创建WebSocket连接
+function createWebSocket() {
+  if (ws && (ws.readyState === WS.OPEN || ws.readyState === WS.CONNECTING)) {
+    return;
+  }
+
+  try {
+    ws = new WS(wsUrl, [], { handshakeTimeout: 5000 });
+    wsConnected = false;
+
+    ws.on('open', () => {
+      console.log('[SYNC] WebSocket connected');
+      wsConnected = true;
+      reconnectAttempts = 0;
+    });
+
+    ws.on('close', (code: number, reason: Buffer) => {
+      console.log('[SYNC] WebSocket closed:', code, reason?.toString());
+      wsConnected = false;
+      handleReconnect();
+    });
+
+    ws.on('error', (err: Error) => {
+      console.error('[SYNC] WebSocket error:', err);
+      wsConnected = false;
+    });
+
+    ws.on('message', (data: RawData) => {
+      console.log('[SYNC] received response:', String(data));
+    });
+  } catch (e) {
+    console.error('[SYNC] Failed to create WebSocket:', e);
+    handleReconnect();
+  }
+}
+
+// 自动重连机制
+function handleReconnect() {
+  if (reconnectAttempts < maxReconnectAttempts) {
+    reconnectAttempts++;
+    console.log(`[SYNC] Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`);
+    setTimeout(createWebSocket, reconnectDelay);
+  } else {
+    console.error('[SYNC] Max reconnect attempts reached. Please check the server.');
+  }
+}
 
 process.on("unhandledRejection", (reason) => {
   console.warn("Unhandled promise rejection:", reason);
@@ -237,6 +295,8 @@ if (!singleInstanceLock) {
       electronTabStore.get("previouslyClosedTab"),
       app.getPath("userData")
     );
+    // 应用启动后立即创建 WebSocket 连接
+    createWebSocket();
 
     const autoLauncher = new AutoLaunch({
       name: "Whatsapp",
@@ -456,6 +516,43 @@ function addIPCHandlers(mainWindow: BrowserWindow) {
   ipcMain.handle("get-whatsapp-preload-path", () => {
     // @ts-expect-error ImportMeta works correctly
     return import.meta.url.replace("main.js", "whatsapp.preload.js");
+  });
+  // wpp-sync处理函数
+  ipcMain.handle("wpp-sync", async (_event, payload) => {
+    try {
+      // 如果WebSocket未连接，尝试创建连接
+      if (!wsConnected) {
+        console.log('[SYNC] WebSocket not connected, creating new connection...');
+        createWebSocket();
+        // 等待连接建立
+        await new Promise((resolve) => {
+          const timeout = setTimeout(resolve, 2000);
+          const checkInterval = setInterval(() => {
+            if (wsConnected) {
+              clearTimeout(timeout);
+              clearInterval(checkInterval);
+              resolve(true);
+            }
+          }, 100);
+        });
+      }
+
+      // 发送数据
+      if (ws && ws.readyState === WS.OPEN) {
+        const text = JSON.stringify(payload);
+        console.log("[SYNC] sending data, size:", Buffer.byteLength(text), "bytes");
+        ws.send(text);
+        console.log("[SYNC] data sent successfully");
+        return { ok: true };
+      } else {
+        console.error('[SYNC] WebSocket not available');
+        return { ok: false, error: 'WebSocket not available' };
+      }
+    } catch (e) {
+      const errorMsg = e instanceof Error ? e.message : String(e);
+      console.error("[SYNC] sync failed:", errorMsg);
+      return { ok: false, error: errorMsg };
+    }
   });
 
   ipcMain.handle("settings-store-get", () => {
