@@ -157,6 +157,14 @@ contextBridge.exposeInMainWorld("clickMenuItem", (id: string) =>
 
 contextBridge.exposeInMainWorld("platform", process.platform);
 
+contextBridge.exposeInMainWorld("wsGetStatus", () => {
+  return ipcRenderer.invoke("ws-get-status");
+});
+
+contextBridge.exposeInMainWorld("wsReconnect", () => {
+  return ipcRenderer.invoke("ws-reconnect");
+});
+
 contextBridge.exposeInMainWorld("windowActions", {
   minimize: () => ipcRenderer.invoke("minimize-window"),
   maximize: () => ipcRenderer.invoke("maximize-window"),

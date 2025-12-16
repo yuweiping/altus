@@ -517,6 +517,23 @@ function addIPCHandlers(mainWindow: BrowserWindow) {
     // @ts-expect-error ImportMeta works correctly
     return import.meta.url.replace("main.js", "whatsapp.preload.js");
   });
+  ipcMain.handle("ws-get-status", () => {
+    return wsConnected;
+  });
+  ipcMain.handle("ws-reconnect", async () => {
+    createWebSocket();
+    await new Promise((resolve) => {
+      const timeout = setTimeout(resolve, 2000);
+      const check = setInterval(() => {
+        if (wsConnected) {
+          clearInterval(check);
+          clearTimeout(timeout);
+          resolve(true);
+        }
+      }, 100);
+    });
+    return { connected: wsConnected };
+  });
   // wpp-sync处理函数
   ipcMain.handle("wpp-sync", async (_event, payload) => {
     try {

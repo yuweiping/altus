@@ -44,7 +44,7 @@ export const DefaultSettingValues = {
   autoHideMenuBar: true,
   showSaveDialog: true,
   defaultDownloadDir: "",
-  customTitlebar: false,
+  customTitlebar: true,
   systemScrollbars: false,
   rememberWindowSize: true,
   rememberWindowPosition: true,

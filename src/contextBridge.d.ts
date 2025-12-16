@@ -42,5 +42,7 @@ declare global {
     };
     clickMenuItem: (id: string) => Promise<void>;
     platform: NodeJS.Platform;
+    wsGetStatus: () => Promise<boolean>;
+    wsReconnect: () => Promise<{ connected: boolean }>;
   }
 }

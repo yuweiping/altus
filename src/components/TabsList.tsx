@@ -167,32 +167,6 @@ const TabsList: Component = () => {
 
   const [canShowNewChatDialog, setShowNewChatDialog] = createSignal(false)
   const [_, { refetch: refetchAppMenu }] = createResource(window.getAppMenu)
-  const [isSyncing, setIsSyncing] = createSignal(false)
-
-  const triggerSync = () => {
-    if (isSyncing()) return
-    const webview = getActiveWebviewElement()
-    if (!webview) return
-    console.log('TabsList: 触发同步', tabStore.selectedTabId)
-    webview
-      .executeJavaScript(
-        "window.postMessage({direction:'toWPP',action:'START_SYNC'})"
-      )
-      .then(() => console.log('TabsList: 指令已发送'))
-      .catch((e) => console.warn('TabsList: 指令发送失败', e))
-  }
-
-  createEffect(() => {
-    const i = setInterval(() => {
-      const webview = getActiveWebviewElement()
-      if (!webview) return
-      webview
-        .executeJavaScript('window.__WPP_SYNCING__')
-        .then((v) => setIsSyncing(Boolean(v)))
-        .catch((e) => console.warn('TabsList: 读取同步状态失败', e))
-    }, 1000)
-    onCleanup(() => clearInterval(i))
-  })
 
   const addNewTab = () => {
     addTab(getDefaultTab())
@@ -420,21 +394,6 @@ const TabsList: Component = () => {
           <div class="mt-auto flex flex-col gap-2 px-2 pb-4">
             <button
               class="group flex items-center justify-center bg-[#f9f9f9] hover:bg-[#f9f9f9]/10 select-none w-full"
-              onClick={() => {
-                if (isSyncing()) return
-                triggerSync()
-              }}
-              aria-disabled={isSyncing() ? "true" : "false"}
-            >
-              <div class="sr-only">Sync</div>
-              <div class="w-10 h-10 rounded-full border border-[#E9E3DE] bg-[#f9f9f9] flex items-center justify-center">
-                <svg viewBox="0 0 24 24" class="w-6 h-6 text-[#6B7280]" classList={{ 'animate-spin': isSyncing() }}>
-                  <path fill="currentColor" d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 8 8h-2a6 6 0 1 1-6-6c1.65 0 3.15.67 4.24 1.76L14 10h6V4l-2.35 2.35z" />
-                </svg>
-              </div>
-            </button>
-            <button
-              class="group flex items-center justify-center bg-[#f9f9f9] hover:bg-[#f9f9f9]/10 select-none w-full"
               onClick={() => window.clickMenuItem("open-settings")}
             >
               <div class="sr-only">Open settings</div>
@@ -445,21 +404,6 @@ const TabsList: Component = () => {
           </div>
         ) : (
           <div class="flex items-center gap-2 pr-4">
-            <button
-              class="group flex items-center justify-center bg-[#f9f9f9] px-2 py-1.5 hover:bg-[#f9f9f9]/10 select-none"
-              onClick={() => {
-                if (isSyncing()) return
-                triggerSync()
-              }}
-              aria-disabled={isSyncing() ? "true" : "false"}
-            >
-              <div class="sr-only">Sync</div>
-              <div class="w-10 h-10 rounded-full border border-[#E9E3DE] bg-[#f9f9f9] flex items-center justify-center">
-                <svg viewBox="0 0 24 24" class="w-6 h-6 text-[#6B7280]" classList={{ 'animate-spin': isSyncing() }}>
-                  <path fill="currentColor" d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 8 8h-2a6 6 0 1 1-6-6c1.65 0 3.15.67 4.24 1.76L14 10h6V4l-2.35 2.35z" />
-                </svg>
-              </div>
-            </button>
             <button
               class="group flex items-center justify-center bg-[#f9f9f9] px-2 py-1.5 hover:bg-[#f9f9f9]/10 select-none"
               onClick={() => window.clickMenuItem("open-settings")}
