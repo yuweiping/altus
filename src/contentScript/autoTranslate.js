@@ -5,9 +5,9 @@ let enabled = true
 let observerRef = null
 
 // WhatsApp 消息 span 选择器
-const SPAN_SELECTOR = 'span._ao3e.selectable-text.copyable-text'
+const SPAN_SELECTOR = 'span[data-testid="selectable-text"]'
 // 消息气泡容器（你指定的父块）
-const MESSAGE_CONTAINER_SELECTOR = 'div._akbu.x6ikm8r.x10wlt62'
+const MESSAGE_CONTAINER_SELECTOR = 'div.copyable-text'
 
 // 状态管理：WeakMap<container, 'loading' | 'done'>
 const containerState = new WeakMap()
@@ -186,7 +186,7 @@ function ensureLoading(span) {
 async function processAll() {
   const spans = Array.from(document.querySelectorAll(SPAN_SELECTOR))
   const targets = spans.filter(needsTranslation)
-
+  console.log('[AutoTranslate] 发现目标', targets.length, '条')
   if (targets.length === 0) return
 
   // 限制并发（防 API 限流）
@@ -208,14 +208,12 @@ function startObserving() {
     for (const mutation of mutations) {
       for (const node of mutation.addedNodes) {
         if (node.nodeType !== 1) continue
-
         let spans = []
         if (node.matches && node.matches(SPAN_SELECTOR)) {
           spans = [node]
         } else if (node.querySelectorAll) {
           spans = node.querySelectorAll(SPAN_SELECTOR)
         }
-
         for (const span of spans) {
           if (needsTranslation(span)) {
             ensureLoading(span)
