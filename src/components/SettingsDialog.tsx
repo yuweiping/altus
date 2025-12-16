@@ -38,20 +38,6 @@ const SettingsDialog: Component<{
             <Dialog.Description class="overflow-y-auto">
               <div class="py-2.5">
                 <StyledSwitch
-                  checked={getSettingValue("trayIcon")}
-                  onChange={(checked) => setSettingValue("trayIcon", checked)}
-                  class="items-start"
-                >
-                  <div class="flex flex-col gap-1.5">
-                    <div class="font-semibold">{t("trayIcon")}</div>
-                    <div class="text-zinc-700 max-w-[30ch] leading-snug text-sm">
-                      {t("trayIconDescription")}
-                    </div>
-                  </div>
-                </StyledSwitch>
-              </div>
-              <div class="py-2.5">
-                <StyledSwitch
                   checked={getSettingValue("tabBar")}
                   onChange={(checked) => setSettingValue("tabBar", checked)}
                   class="items-start"
@@ -183,40 +169,6 @@ const SettingsDialog: Component<{
               </div>
               <div class="py-2.5">
                 <StyledSwitch
-                  checked={getSettingValue("rememberWindowSize")}
-                  onChange={(checked) =>
-                    setSettingValue("rememberWindowSize", checked)
-                  }
-                  class="items-start"
-                >
-                  <div class="flex flex-col gap-1.5">
-                    <div class="font-semibold">{t("rememberWindowSize")}</div>
-                    <div class="text-zinc-700 max-w-[30ch] leading-snug text-sm">
-                      {t("rememberWindowSizeDescription")}
-                    </div>
-                  </div>
-                </StyledSwitch>
-              </div>
-              <div class="py-2.5">
-                <StyledSwitch
-                  checked={getSettingValue("rememberWindowPosition")}
-                  onChange={(checked) =>
-                    setSettingValue("rememberWindowPosition", checked)
-                  }
-                  class="items-start"
-                >
-                  <div class="flex flex-col gap-1.5">
-                    <div class="font-semibold">
-                      {t("rememberWindowPosition")}
-                    </div>
-                    <div class="text-zinc-700 max-w-[30ch] leading-snug text-sm">
-                      {t("rememberWindowPositionDescription")}
-                    </div>
-                  </div>
-                </StyledSwitch>
-              </div>
-              <div class="py-2.5">
-                <StyledSwitch
                   checked={getSettingValue("preventEnter")}
                   onChange={(checked) =>
                     setSettingValue("preventEnter", checked)
@@ -246,23 +198,6 @@ const SettingsDialog: Component<{
                     <div class="font-semibold">{t("customTitlebar")}</div>
                     <div class="text-zinc-700 max-w-[40ch] leading-snug text-sm">
                       {t("customTitlebarDescription")}
-                    </div>
-                  </div>
-                </StyledSwitch>
-              </div>
-              <div class="py-2.5">
-                <StyledSwitch
-                  checked={getSettingValue("autoHideMenuBar")}
-                  onChange={(checked) =>
-                    setSettingValue("autoHideMenuBar", checked)
-                  }
-                  class="items-start"
-                  disabled={!!getSettingValue("customTitlebar")}
-                >
-                  <div class="flex flex-col gap-1.5">
-                    <div class="font-semibold">{t("autoHideMenuBar")}</div>
-                    <div class="text-zinc-700 max-w-[40ch] leading-snug text-sm">
-                      {t("autoHideMenuBarDescription")}
                     </div>
                   </div>
                 </StyledSwitch>
