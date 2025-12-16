@@ -32,185 +32,14 @@ import {
 import AutoLaunch from "auto-launch";
 import electronDl from "electron-dl";
 import contextMenu from "electron-context-menu";
-import type { RawData } from "ws";
-// 使用 CommonJS 方式引入 ws，避免被打包为浏览器 stub
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const WS = require('ws');
-// 主进程中维护的WebSocket实例
-let ws: any | null = null;
-let wsConnected = false;
-let reconnectAttempts = 0;
-const maxReconnectAttempts = 5;
-const reconnectDelay = 3000;
-const wsUrl = "ws://localhost:82/ws";
+import {
+  createWebSocket,
+  isConnected as wsIsConnected,
+  ensureConnected as wsEnsureConnected,
+  send as wsSend,
+  getIncrementalContacts,
+} from "./ws";
 
-// 创建WebSocket连接
-function createWebSocket() {
-  if (ws && (ws.readyState === WS.OPEN || ws.readyState === WS.CONNECTING)) {
-    return;
-  }
-
-  try {
-    ws = new WS(wsUrl, [], { handshakeTimeout: 5000 });
-    wsConnected = false;
-
-    ws.on('open', () => {
-      console.log('[SYNC] WebSocket connected');
-      wsConnected = true;
-      reconnectAttempts = 0;
-    });
-
-    ws.on('close', (code: number, reason: Buffer) => {
-      console.log('[SYNC] WebSocket closed:', code, reason?.toString());
-      wsConnected = false;
-      handleReconnect();
-    });
-
-    ws.on('error', (err: Error) => {
-      console.error('[SYNC] WebSocket error:', err);
-      wsConnected = false;
-    });
-
-    ws.on('message', (data: RawData) => {
-        try {
-                      // 正确处理二进制数据
-            let messageStr: string;
-            if (data instanceof Buffer) {
-                messageStr = data.toString('utf8');
-            } else if (typeof data === 'string') {
-                messageStr = data;
-            } else {
-                messageStr = String(data);
-            }
-            const message = JSON.parse(messageStr);
-            console.log('[SYNC] received message:', message);
-
-            // 处理 sync-contacts 类型的消息
-            if (message.type === 'sync-contacts' && message.wid && message.contacts) {
-                handleSyncContactsResponse(message.wid, message.contacts);
-            }
-        } catch (e) {
-            console.error('[SYNC] Failed to parse message:', e);
-            console.log('[SYNC] raw message:', String(data));
-        }
-    });
-  } catch (e) {
-    console.error('[SYNC] Failed to create WebSocket:', e);
-    handleReconnect();
-  }
-}
-// ... existing code ...
-function handleSyncContactsResponse(wid: string, newContacts: any) {
-    try {
-        console.log(`[SYNC] Processing contacts for wid: ${wid}`);
-        console.log(`[SYNC] Received contacts data type:`, typeof newContacts);
-        console.log(`[SYNC] Received contacts data:`, newContacts);
-
-        // 处理不同的数据格式
-        let processedContacts: string[];
-
-        if (Array.isArray(newContacts)) {
-            // 如果是数组格式（手机号码数组）
-            if (newContacts.length > 0 && typeof newContacts[0] === 'string') {
-                // 直接使用手机号码数组
-                processedContacts = newContacts;
-                console.log(`[SYNC] Using phone array: ${processedContacts.length} contacts`);
-            } else if (typeof newContacts[0] === 'object') {
-                // 如果是联系人对象数组，提取手机号
-                processedContacts = newContacts.map(contact => contact.phone || contact.id || contact.name || '');
-                processedContacts = processedContacts.filter(phone => phone !== '');
-                console.log(`[SYNC] Extracted phones from contact objects: ${processedContacts.length}`);
-            } else {
-                console.error(`[SYNC] Unknown contacts format:`, newContacts);
-                return;
-            }
-        } else {
-            console.error(`[SYNC] Invalid contacts data format:`, newContacts);
-            return;
-        }
-
-        const existingContacts = electronContactStore.get(wid) || [];
-        console.log(`[SYNC] Existing contacts: ${existingContacts.length}`);
-
-        // 合并联系人（去重）
-        const mergedContacts = mergeContacts(existingContacts, processedContacts);
-        console.log(`[SYNC] After merge: ${mergedContacts.length} contacts`);
-
-        // 更新存储（简化：直接存储联系人数组）
-        electronContactStore.set(wid, mergedContacts);
-        console.log(`[SYNC] Contacts updated for wid: ${wid}, total contacts: ${mergedContacts.length}`);
-
-    } catch (e) {
-        console.error(`[SYNC] Failed to update contacts for wid: ${wid}`, e);
-    }
-}
-// 合并联系人列表（去重）- 现在处理字符串数组
-function mergeContacts(existing: string[], newContacts: string[]): string[] {
-    console.log('[SYNC] Starting merge contacts...');
-    console.log(`[SYNC] Existing contacts: ${existing.length}`);
-    console.log(`[SYNC] New contacts: ${newContacts.length}`);
-
-    const contactSet = new Set<string>();
-
-    // 先添加现有联系人
-    existing.forEach((phone, index) => {
-        if (phone && phone.trim() !== '') {
-            contactSet.add(phone.trim());
-            console.log(`[SYNC] Added existing contact ${index}: ${phone}`);
-        } else {
-            console.log(`[SYNC] Skipped existing contact ${index} (empty phone)`);
-        }
-    });
-
-    // 再添加新联系人（自动去重）
-    newContacts.forEach((phone, index) => {
-        if (phone && phone.trim() !== '') {
-            const trimmedPhone = phone.trim();
-            if (contactSet.has(trimmedPhone)) {
-                console.log(`[SYNC] Duplicate contact ${index}: ${trimmedPhone}`);
-            } else {
-                contactSet.add(trimmedPhone);
-            }
-        } else {
-            console.log(`[SYNC] Skipped new contact ${index} (empty phone)`);
-        }
-    });
-
-    const result = Array.from(contactSet);
-    console.log(`[SYNC] Merge completed. Total contacts: ${result.length}`);
-    return result;
-}
-
-function getIncrementalContacts(wid: string, currentContacts: string[]): string[] {
-    try {
-        const existingContacts = electronContactStore.get(wid) || [];
-
-        if (existingContacts.length === 0) {
-            return currentContacts; // 如果没有现有数据，返回全部
-        }
-
-        // 找出新增的联系人
-        const incrementalContacts = currentContacts.filter(currentPhone => {
-            return !existingContacts.includes(currentPhone);
-        });
-
-        console.log(`[SYNC] Incremental contacts for wid ${wid}: ${incrementalContacts.length} out of ${currentContacts.length}`);
-        return incrementalContacts;
-    } catch (e) {
-        console.error(`[SYNC] Failed to get incremental contacts for wid: ${wid}`, e);
-        return currentContacts; // 出错时返回全部数据
-    }
-}
-// 自动重连机制
-function handleReconnect() {
-  if (reconnectAttempts < maxReconnectAttempts) {
-    reconnectAttempts++;
-    console.log(`[SYNC] Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`);
-    setTimeout(createWebSocket, reconnectDelay);
-  } else {
-    console.error('[SYNC] Max reconnect attempts reached. Please check the server.');
-  }
-}
 
 process.on("unhandledRejection", (reason) => {
   console.warn("Unhandled promise rejection:", reason);
@@ -640,41 +469,16 @@ function addIPCHandlers(mainWindow: BrowserWindow) {
     return import.meta.url.replace("main.js", "whatsapp.preload.js");
   });
   ipcMain.handle("ws-get-status", () => {
-    return wsConnected;
+    return wsIsConnected();
   });
   ipcMain.handle("ws-reconnect", async () => {
-    createWebSocket();
-    await new Promise((resolve) => {
-      const timeout = setTimeout(resolve, 2000);
-      const check = setInterval(() => {
-        if (wsConnected) {
-          clearInterval(check);
-          clearTimeout(timeout);
-          resolve(true);
-        }
-      }, 100);
-    });
-    return { connected: wsConnected };
+    await wsEnsureConnected(2000);
+    return { connected: wsIsConnected() };
   });
   // wpp-sync处理函数
   ipcMain.handle("wpp-sync", async (_event, payload) => {
     try {
-      // 如果WebSocket未连接，尝试创建连接
-      if (!wsConnected) {
-        console.log('[SYNC] WebSocket not connected, creating new connection...');
-        createWebSocket();
-        // 等待连接建立
-        await new Promise((resolve) => {
-          const timeout = setTimeout(resolve, 2000);
-          const checkInterval = setInterval(() => {
-            if (wsConnected) {
-              clearTimeout(timeout);
-              clearInterval(checkInterval);
-              resolve(true);
-            }
-          }, 100);
-        });
-      }
+      await wsEnsureConnected(2000);
         // 处理增量同步逻辑
         let finalPayload = payload;
         if (payload.wid && payload.contacts && Array.isArray(payload.contacts)) {
@@ -683,18 +487,24 @@ function addIPCHandlers(mainWindow: BrowserWindow) {
                 ...payload,
                 contacts: incrementalContacts,
             };
+            if(incrementalContacts.length == 0){
+              return { ok: true };
+            }
             console.log(`[SYNC] Sending incremental data: ${incrementalContacts.length} contacts (original: ${payload.contacts.length})`);
         }
         // 发送数据
-        if (ws && ws.readyState === WS.OPEN) {
+        {
             const text = JSON.stringify(finalPayload);
+
             console.log("[SYNC] sending data, size:", Buffer.byteLength(text), "bytes");
-            ws.send(text);
+            const ok = wsSend(finalPayload);
+            if (ok) {
             console.log("[SYNC] data sent successfully");
             return { ok: true };
-        } else {
-            console.error('[SYNC] WebSocket not available');
-            return { ok: false, error: 'WebSocket not available' };
+            } else {
+              console.error('[SYNC] WebSocket not available');
+              return { ok: false, error: 'WebSocket not available' };
+            }
         }
     } catch (e) {
       const errorMsg = e instanceof Error ? e.message : String(e);
