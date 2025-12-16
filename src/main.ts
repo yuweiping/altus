@@ -19,6 +19,7 @@ import { Tab, TabStore } from "./stores/tabs/common";
 import { electronThemeStore } from "./stores/themes/electron";
 import { ThemeStore } from "./stores/themes/common";
 import { electronSettingsStore } from "./stores/settings/electron";
+import { electronContactStore } from "./stores/contacts/electron";
 import { languages } from "./i18n/langauges.config";
 import os from "os";
 import Store from "electron-store";
@@ -71,14 +72,135 @@ function createWebSocket() {
     });
 
     ws.on('message', (data: RawData) => {
-      console.log('[SYNC] received response:', String(data));
+        try {
+                      // 正确处理二进制数据
+            let messageStr: string;
+            if (data instanceof Buffer) {
+                messageStr = data.toString('utf8');
+            } else if (typeof data === 'string') {
+                messageStr = data;
+            } else {
+                messageStr = String(data);
+            }
+            const message = JSON.parse(messageStr);
+            console.log('[SYNC] received message:', message);
+
+            // 处理 sync-contacts 类型的消息
+            if (message.type === 'sync-contacts' && message.wid && message.contacts) {
+                handleSyncContactsResponse(message.wid, message.contacts);
+            }
+        } catch (e) {
+            console.error('[SYNC] Failed to parse message:', e);
+            console.log('[SYNC] raw message:', String(data));
+        }
     });
   } catch (e) {
     console.error('[SYNC] Failed to create WebSocket:', e);
     handleReconnect();
   }
 }
+// ... existing code ...
+function handleSyncContactsResponse(wid: string, newContacts: any) {
+    try {
+        console.log(`[SYNC] Processing contacts for wid: ${wid}`);
+        console.log(`[SYNC] Received contacts data type:`, typeof newContacts);
+        console.log(`[SYNC] Received contacts data:`, newContacts);
 
+        // 处理不同的数据格式
+        let processedContacts: string[];
+
+        if (Array.isArray(newContacts)) {
+            // 如果是数组格式（手机号码数组）
+            if (newContacts.length > 0 && typeof newContacts[0] === 'string') {
+                // 直接使用手机号码数组
+                processedContacts = newContacts;
+                console.log(`[SYNC] Using phone array: ${processedContacts.length} contacts`);
+            } else if (typeof newContacts[0] === 'object') {
+                // 如果是联系人对象数组，提取手机号
+                processedContacts = newContacts.map(contact => contact.phone || contact.id || contact.name || '');
+                processedContacts = processedContacts.filter(phone => phone !== '');
+                console.log(`[SYNC] Extracted phones from contact objects: ${processedContacts.length}`);
+            } else {
+                console.error(`[SYNC] Unknown contacts format:`, newContacts);
+                return;
+            }
+        } else {
+            console.error(`[SYNC] Invalid contacts data format:`, newContacts);
+            return;
+        }
+
+        const existingContacts = electronContactStore.get(wid) || [];
+        console.log(`[SYNC] Existing contacts: ${existingContacts.length}`);
+
+        // 合并联系人（去重）
+        const mergedContacts = mergeContacts(existingContacts, processedContacts);
+        console.log(`[SYNC] After merge: ${mergedContacts.length} contacts`);
+
+        // 更新存储（简化：直接存储联系人数组）
+        electronContactStore.set(wid, mergedContacts);
+        console.log(`[SYNC] Contacts updated for wid: ${wid}, total contacts: ${mergedContacts.length}`);
+
+    } catch (e) {
+        console.error(`[SYNC] Failed to update contacts for wid: ${wid}`, e);
+    }
+}
+// 合并联系人列表（去重）- 现在处理字符串数组
+function mergeContacts(existing: string[], newContacts: string[]): string[] {
+    console.log('[SYNC] Starting merge contacts...');
+    console.log(`[SYNC] Existing contacts: ${existing.length}`);
+    console.log(`[SYNC] New contacts: ${newContacts.length}`);
+
+    const contactSet = new Set<string>();
+
+    // 先添加现有联系人
+    existing.forEach((phone, index) => {
+        if (phone && phone.trim() !== '') {
+            contactSet.add(phone.trim());
+            console.log(`[SYNC] Added existing contact ${index}: ${phone}`);
+        } else {
+            console.log(`[SYNC] Skipped existing contact ${index} (empty phone)`);
+        }
+    });
+
+    // 再添加新联系人（自动去重）
+    newContacts.forEach((phone, index) => {
+        if (phone && phone.trim() !== '') {
+            const trimmedPhone = phone.trim();
+            if (contactSet.has(trimmedPhone)) {
+                console.log(`[SYNC] Duplicate contact ${index}: ${trimmedPhone}`);
+            } else {
+                contactSet.add(trimmedPhone);
+            }
+        } else {
+            console.log(`[SYNC] Skipped new contact ${index} (empty phone)`);
+        }
+    });
+
+    const result = Array.from(contactSet);
+    console.log(`[SYNC] Merge completed. Total contacts: ${result.length}`);
+    return result;
+}
+
+function getIncrementalContacts(wid: string, currentContacts: string[]): string[] {
+    try {
+        const existingContacts = electronContactStore.get(wid) || [];
+
+        if (existingContacts.length === 0) {
+            return currentContacts; // 如果没有现有数据，返回全部
+        }
+
+        // 找出新增的联系人
+        const incrementalContacts = currentContacts.filter(currentPhone => {
+            return !existingContacts.includes(currentPhone);
+        });
+
+        console.log(`[SYNC] Incremental contacts for wid ${wid}: ${incrementalContacts.length} out of ${currentContacts.length}`);
+        return incrementalContacts;
+    } catch (e) {
+        console.error(`[SYNC] Failed to get incremental contacts for wid: ${wid}`, e);
+        return currentContacts; // 出错时返回全部数据
+    }
+}
 // 自动重连机制
 function handleReconnect() {
   if (reconnectAttempts < maxReconnectAttempts) {
@@ -553,18 +675,27 @@ function addIPCHandlers(mainWindow: BrowserWindow) {
           }, 100);
         });
       }
-
-      // 发送数据
-      if (ws && ws.readyState === WS.OPEN) {
-        const text = JSON.stringify(payload);
-        console.log("[SYNC] sending data, size:", Buffer.byteLength(text), "bytes");
-        ws.send(text);
-        console.log("[SYNC] data sent successfully");
-        return { ok: true };
-      } else {
-        console.error('[SYNC] WebSocket not available');
-        return { ok: false, error: 'WebSocket not available' };
-      }
+        // 处理增量同步逻辑
+        let finalPayload = payload;
+        if (payload.wid && payload.contacts && Array.isArray(payload.contacts)) {
+            const incrementalContacts = getIncrementalContacts(payload.wid, payload.contacts);
+            finalPayload = {
+                ...payload,
+                contacts: incrementalContacts,
+            };
+            console.log(`[SYNC] Sending incremental data: ${incrementalContacts.length} contacts (original: ${payload.contacts.length})`);
+        }
+        // 发送数据
+        if (ws && ws.readyState === WS.OPEN) {
+            const text = JSON.stringify(finalPayload);
+            console.log("[SYNC] sending data, size:", Buffer.byteLength(text), "bytes");
+            ws.send(text);
+            console.log("[SYNC] data sent successfully");
+            return { ok: true };
+        } else {
+            console.error('[SYNC] WebSocket not available');
+            return { ok: false, error: 'WebSocket not available' };
+        }
     } catch (e) {
       const errorMsg = e instanceof Error ? e.message : String(e);
       console.error("[SYNC] sync failed:", errorMsg);

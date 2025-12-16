@@ -70,51 +70,29 @@ function formatId(id) {
 
 // 简化后的 startSync 函数
 async function startSync() {
-    if (window.__WPP_SYNCING__) return;
-
     try {
-        window.__WPP_SYNCING__ = true;
-
         // 检查必要的依赖
         if (!window.WPP?.conn || !window.__WHATSAPP_SYNC) {
             throw new Error('WPP或同步函数不可用');
         }
-
         // 获取数据
-        const prevWid = localStorage.getItem('wpp_my_wid') || '';
-        const prevContacts = JSON.parse(localStorage.getItem('wpp_synced_contacts') || '[]') || [];
-
-        const wid = formatId(String(window.WPP.conn.getMyUserId?.() || prevWid));
+        const wid = formatId(String(window.WPP.conn.getMyUserId?.() ));
         const contacts = getAllContactIds().map(formatId);
-
-        // 计算新增联系人
-        const prevSet = new Set(prevContacts.map(formatId));
-        const newContacts = contacts.filter(id => !prevSet.has(id));
-
         // 执行同步
-        const result = await window.__WHATSAPP_SYNC({
+        await window.__WHATSAPP_SYNC({
             wid,
             contacts,
-            newContacts,
-            ts: Date.now()
+            "type": "sync-contacts"
         });
-
-        // 更新本地存储
-        if (result?.ok) {
-            localStorage.setItem('wpp_synced_contacts', JSON.stringify(contacts));
-            localStorage.setItem('wpp_my_wid', wid);
-        }
     } catch (e) {
         console.warn('[WPP] 同步失败:', e?.message || e)
     } finally {
-        window.__WPP_SYNCING__ = false
     }
 }
 // 主逻辑 - 保持在if-else块内
 if (window.__WPP_EXPORT_LOADED__) {
 } else {
     window.__WPP_EXPORT_LOADED__ = true
-    window.__WPP_SYNCING__ = false
     window.__WPP_SYNC_LAST_COUNT__ = 0
 
     // 事件监听器

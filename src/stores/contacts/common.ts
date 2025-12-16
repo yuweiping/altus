@@ -1,22 +1,7 @@
-export interface Contact {
-    id?: string;
-    phone?: string;
-    name?: string;
-    [key: string]: any;
-}
-
-export interface ContactSyncData {
-    wid: string;
-    contacts: Contact[];
-    lastSyncTime: number;
-}
-
-export type ContactStore = Record<string, ContactSyncData>;
-
+export type ContactStore = Record<string, string[]>; // 简化为 wid 直接对应联系人数组
 export const ContactStoreDefaults = (): ContactStore => ({});
-
 export type ElectronContactStoreIpcApi = {
     getStore: () => Promise<ContactStore>;
-    getContacts: (wid?: string) => Promise<ContactSyncData | ContactStore | null>;
+    getContacts: (wid?: string) => Promise<string[] | ContactStore | null>;
     clearContacts: (wid?: string) => Promise<{ ok: boolean; message: string }>;
 };
