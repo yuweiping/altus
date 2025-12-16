@@ -1972,6 +1972,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/ws@npm:^8":
+  version: 8.18.1
+  resolution: "@types/ws@npm:8.18.1"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/61aff1129143fcc4312f083bc9e9e168aa3026b7dd6e70796276dcfb2c8211c4292603f9c4864fae702f2ed86e4abd4d38aa421831c2fd7f856c931a481afbab
+  languageName: node
+  linkType: hard
+
 "@types/yauzl@npm:^2.9.1":
   version: 2.10.0
   resolution: "@types/yauzl@npm:2.10.0"
@@ -2239,44 +2248,6 @@ __metadata:
   checksum: 10c0/ac4f72adf727ee425e049bc9d8b31d4a57e1c90da8d28bcd23d60781b12fcd6fc3d68db5df16994c57b78b94eed7988f5a6b482fd376dc5b084125e20a0a622e
   languageName: node
   linkType: hard
-
-"whatsapp@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "whatsapp@workspace:."
-  dependencies:
-    "@electron-forge/cli": "npm:^7.8.0"
-    "@electron-forge/maker-base": "npm:^7.8.0"
-    "@electron-forge/maker-dmg": "npm:^7.8.0"
-    "@electron-forge/plugin-auto-unpack-natives": "npm:^7.8.0"
-    "@electron-forge/plugin-vite": "npm:^7.1.0"
-    "@kobalte/core": "npm:^0.13.8"
-    "@kobalte/tailwindcss": "npm:^0.9.0"
-    "@kobalte/utils": "npm:^0.9.0"
-    "@types/auto-launch": "npm:^5.0.3"
-    "@typescript-eslint/eslint-plugin": "npm:^5.0.0"
-    "@typescript-eslint/parser": "npm:^5.0.0"
-    app-builder-lib: "npm:^26.0.12"
-    auto-launch: "npm:^5.0.6"
-    autoprefixer: "npm:^10.4.15"
-    color2k: "npm:^2.0.3"
-    dmg-builder: "npm:^26.0.12"
-    electron: "npm:35.1.5"
-    electron-context-menu: "npm:^4.0.5"
-    electron-dl: "npm:^4.0.0"
-    electron-store: "npm:^8.1.0"
-    eslint: "npm:^8.0.1"
-    eslint-plugin-import: "npm:^2.31.0"
-    nanoid: "npm:^5.1.5"
-    postcss: "npm:^8.5.3"
-    solid-js: "npm:^1.9.5"
-    tailwind-merge: "npm:^3.2.0"
-    tailwindcss: "npm:^3.3.3"
-    ts-node: "npm:^10.0.0"
-    typescript: "npm:^5.8.3"
-    vite-plugin-solid: "npm:^2.11.6"
-    zod: "npm:^3.24.2"
-  languageName: unknown
-  linkType: soft
 
 "ansi-escapes@npm:^4.3.0":
   version: 4.3.2
@@ -9868,6 +9839,46 @@ __metadata:
   languageName: node
   linkType: hard
 
+"whatsapp@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "whatsapp@workspace:."
+  dependencies:
+    "@electron-forge/cli": "npm:^7.8.0"
+    "@electron-forge/maker-base": "npm:^7.8.0"
+    "@electron-forge/maker-dmg": "npm:^7.8.0"
+    "@electron-forge/plugin-auto-unpack-natives": "npm:^7.8.0"
+    "@electron-forge/plugin-vite": "npm:^7.1.0"
+    "@kobalte/core": "npm:^0.13.8"
+    "@kobalte/tailwindcss": "npm:^0.9.0"
+    "@kobalte/utils": "npm:^0.9.0"
+    "@types/auto-launch": "npm:^5.0.3"
+    "@types/ws": "npm:^8"
+    "@typescript-eslint/eslint-plugin": "npm:^5.0.0"
+    "@typescript-eslint/parser": "npm:^5.0.0"
+    app-builder-lib: "npm:^26.0.12"
+    auto-launch: "npm:^5.0.6"
+    autoprefixer: "npm:^10.4.15"
+    color2k: "npm:^2.0.3"
+    dmg-builder: "npm:^26.0.12"
+    electron: "npm:35.1.5"
+    electron-context-menu: "npm:^4.0.5"
+    electron-dl: "npm:^4.0.0"
+    electron-store: "npm:^8.1.0"
+    eslint: "npm:^8.0.1"
+    eslint-plugin-import: "npm:^2.31.0"
+    nanoid: "npm:^5.1.5"
+    postcss: "npm:^8.5.3"
+    solid-js: "npm:^1.9.5"
+    tailwind-merge: "npm:^3.2.0"
+    tailwindcss: "npm:^3.3.3"
+    ts-node: "npm:^10.0.0"
+    typescript: "npm:^5.8.3"
+    vite-plugin-solid: "npm:^2.11.6"
+    ws: "npm:^8.18.3"
+    zod: "npm:^3.24.2"
+  languageName: unknown
+  linkType: soft
+
 "whatwg-url@npm:^5.0.0":
   version: 5.0.0
   resolution: "whatwg-url@npm:5.0.0"
@@ -10040,6 +10051,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 10c0/aec4ef4eb65821a7dde7b44790f8699cfafb7978c9b080f6d7a98a7f8fc0ce674c027073a78574c94786ba7112cc90fa2cc94fc224ceba4d4b1030cff9662494
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.18.3":
+  version: 8.18.3
+  resolution: "ws@npm:8.18.3"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 10c0/eac918213de265ef7cb3d4ca348b891a51a520d839aa51cdb8ca93d4fa7ff9f6ccb339ccee89e4075324097f0a55157c89fa3f7147bde9d8d7e90335dc087b53
   languageName: node
   linkType: hard
 
